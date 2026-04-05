@@ -76,38 +76,55 @@ ${styles.dividerLong}
     });
 
     bot.onText(/\/menu/, async (msg) => {
-        const menuText = `${styles.header('T20 CONTROL MENU', '📜')}
-Choose a command from the buttons below or type it manually.
+        const menuText = `${styles.box('T20 CONTROL MENU', 'Quick access to the most useful bot commands')}
+
+${styles.section('👤', 'General', [
+            styles.listItem('⚡', '/start — Welcome screen'),
+            styles.listItem('🗂', '/menu — Open this command menu'),
+            styles.listItem('❓', '/help — Bot help'),
+            styles.listItem('🏓', '/ping — Check latency'),
+        ])}
+
+${styles.section('🛠', 'Utilities', [
+            styles.listItem('🆔', '/id — Your user & chat info'),
+            styles.listItem('📢', '/post — Send channel post'),
+            styles.listItem('⏰', '/autopost — Auto-post controls'),
+        ])}
+
+${styles.section('👥', 'Group Tools', [
+            styles.listItem('🎉', '/welcome status — Welcome status'),
+            styles.listItem('🌙', '/goodbye status — Goodbye status'),
+            styles.listItem('✅', '/testwelcome — Test welcome'),
+            styles.listItem('🚪', '/testgoodbye — Test goodbye'),
+        ])}
 
 ${styles.divider}
-<b>Tip:</b> Use <code>/help</code> or <code>/start</code> to see more features.
-Use <code>/welcome on/off</code> and <code>/goodbye on/off</code> to control messages.
-Use <code>/testwelcome</code> and <code>/testgoodbye</code> to test messages.`;
+<i>Tap a button below or type the command directly.</i>`;
 
         const keyboard = [
             [
-                { text: '/start', callback_data: '/start' },
-                { text: '/menu', callback_data: '/menu' }
+                { text: 'Start', callback_data: '/start' },
+                { text: 'Menu', callback_data: '/menu' }
             ],
             [
-                { text: '/ping', callback_data: '/ping' },
-                { text: '/help', callback_data: '/help' }
+                { text: 'Help', callback_data: '/help' },
+                { text: 'Ping', callback_data: '/ping' }
             ],
             [
-                { text: '/id', callback_data: '/id' },
-                { text: '/post', callback_data: '/post' }
+                { text: 'My ID', callback_data: '/id' },
+                { text: 'Post', callback_data: '/post' }
             ],
             [
-                { text: '/autopost', callback_data: '/autopost' },
-                { text: '/admin list', callback_data: '/admin list' }
+                { text: 'Autopost', callback_data: '/autopost' },
+                { text: 'Admins', callback_data: '/admin list' }
             ],
             [
-                { text: '/welcome on/off', callback_data: '/welcome status' },
-                { text: '/goodbye on/off', callback_data: '/goodbye status' }
+                { text: 'Welcome status', callback_data: '/welcome status' },
+                { text: 'Goodbye status', callback_data: '/goodbye status' }
             ],
             [
-                { text: '/testwelcome', callback_data: '/testwelcome' },
-                { text: '/testgoodbye', callback_data: '/testgoodbye' }
+                { text: 'Test welcome', callback_data: '/testwelcome' },
+                { text: 'Test goodbye', callback_data: '/testgoodbye' }
             ]
         ];
 
@@ -122,8 +139,7 @@ Use <code>/testwelcome</code> and <code>/testgoodbye</code> to test messages.`;
             });
         } catch (error) {
             console.error('Failed to send menu photo, using text fallback:', error.message);
-            // Fallback to text message with buttons
-            bot.sendMessage(msg.chat.id, menuText, {
+            await bot.sendMessage(msg.chat.id, menuText, {
                 parse_mode: 'HTML',
                 reply_markup: {
                     inline_keyboard: keyboard
