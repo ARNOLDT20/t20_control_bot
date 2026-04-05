@@ -48,6 +48,8 @@ t20_control_bot/
 - `/welcome status` - Check welcome message status
 - `/goodbye on/off` - Enable/disable goodbye messages for leaving members
 - `/goodbye status` - Check goodbye message status
+- `/testwelcome` - Test welcome message (groups only)
+- `/testgoodbye` - Test goodbye message (groups only)
 
 ### Auto-Posting System
 - `/autopost on` - Enable hourly posts

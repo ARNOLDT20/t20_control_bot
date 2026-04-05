@@ -120,6 +120,8 @@ ${styles.section('👥', 'Group Management', [
                 styles.listItem('/welcome status', 'Check welcome status'),
                 styles.listItem('/goodbye on/off', 'Toggle goodbye messages'),
                 styles.listItem('/goodbye status', 'Check goodbye status'),
+                styles.listItem('/testwelcome', 'Test welcome message'),
+                styles.listItem('/testgoodbye', 'Test goodbye message'),
             ])}
 
 ${styles.section('⚙️', 'System', [
