@@ -6,18 +6,13 @@ const { SocksProxyAgent } = require('socks-proxy-agent');
 const pluginLoader = require('./plugins');
 const styles = require('./utils/styles');
 const blogFetcher = require('./utils/blogFetcher');
-
-// === CONFIG ===
-const TOKEN = (process.env.TELEGRAM_TOKEN || '').trim();
-const CHANNEL_ID = process.env.CHANNEL_ID || '@t20classictech';
-const ADMIN_IDS = (process.env.ADMIN_IDS || '').split(',').filter(id => id.trim()).map(Number);
+const { TOKEN, CHANNEL_ID, ADMIN_IDS, PROXY_URL } = require('./config');
 
 if (!TOKEN) {
     console.error('Missing TELEGRAM_TOKEN environment variable. Set TELEGRAM_TOKEN and restart the bot.');
     process.exit(1);
 }
 
-const PROXY_URL = process.env.SOCKS_PROXY || null;
 const PROXY_AGENT = PROXY_URL ? new SocksProxyAgent(PROXY_URL) : null;
 
 // Helper function to check if user is admin
