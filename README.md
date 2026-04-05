@@ -158,7 +158,113 @@ setx CHANNEL_ID "@your_channel"
 npm start
 ```
 
-## 📝 Logs
+## � Deployment Shortcuts
+
+### Heroku (Recommended)
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ARNOLDT20/t20_control_bot)
+
+1. **Click the "Deploy to Heroku" button above**
+2. **Connect your GitHub account** and select this repository
+3. **Set Environment Variables** in Heroku dashboard:
+   - `TELEGRAM_TOKEN` = your_bot_token
+   - `CHANNEL_ID` = @your_channel
+   - `ADMIN_IDS` = 123456789,987654321 (optional)
+4. **Deploy** and your bot will be live!
+
+**Or deploy manually:**
+
+```bash
+heroku create your-app-name
+heroku config:set TELEGRAM_TOKEN="your_bot_token"
+heroku config:set CHANNEL_ID="@your_channel"
+git push heroku main
+```
+
+### Replit
+
+1. **Fork this Replit**
+   - Go to [replit.com](https://replit.com)
+   - Import from GitHub: `ARNOLDT20/t20_control_bot`
+
+2. **Set Secrets**
+   - Go to Tools → Secrets
+   - Add:
+     - `TELEGRAM_TOKEN` = your_bot_token
+     - `CHANNEL_ID` = @your_channel
+     - `ADMIN_IDS` = 123456789,987654321 (optional)
+
+3. **Run**
+   - Click the green "Run" button
+   - Or use: `npm start`
+
+### Railway
+
+1. **Connect Repository**
+   ```bash
+   # Deploy from GitHub
+   railway login
+   railway link
+   railway up
+   ```
+
+2. **Set Variables**
+   ```bash
+   railway variables set TELEGRAM_TOKEN=your_token
+   railway variables set CHANNEL_ID=@your_channel
+   ```
+
+### Render
+
+1. **Connect GitHub**
+   - Connect your GitHub repo: `ARNOLDT20/t20_control_bot`
+   - Set build command: `npm install`
+   - Set start command: `npm start`
+
+2. **Environment Variables**
+   - `TELEGRAM_TOKEN` = your_bot_token
+   - `CHANNEL_ID` = @your_channel
+
+### Local Server (VPS/Dedicated)
+
+```bash
+# Install Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Clone and setup
+git clone https://github.com/ARNOLDT20/t20_control_bot.git
+cd t20_control_bot
+npm install
+
+# Create .env file
+echo "TELEGRAM_TOKEN=your_token" > .env
+echo "CHANNEL_ID=@your_channel" >> .env
+
+# Run with PM2
+npm install -g pm2
+pm2 start npm --name "t20-bot" -- start
+pm2 save
+pm2 startup
+```
+
+### Docker (Advanced)
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+CMD ["npm", "start"]
+```
+
+```bash
+docker build -t t20-bot .
+docker run -e TELEGRAM_TOKEN=your_token -e CHANNEL_ID=@your_channel t20-bot
+```
+
+## �📝 Logs
 
 The console shows:
 ```
