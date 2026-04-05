@@ -115,6 +115,13 @@ ${styles.section('📅', 'Auto-Posting', [
                 styles.listItem('/autopost status', 'Check status'),
             ])}
 
+${styles.section('👥', 'Group Management', [
+                styles.listItem('/welcome on/off', 'Toggle welcome messages'),
+                styles.listItem('/welcome status', 'Check welcome status'),
+                styles.listItem('/goodbye on/off', 'Toggle goodbye messages'),
+                styles.listItem('/goodbye status', 'Check goodbye status'),
+            ])}
+
 ${styles.section('⚙️', 'System', [
                 styles.listItem('/menu', 'Show command menu'),
                 styles.listItem('/admin list', 'Show admins'),

@@ -43,6 +43,12 @@ t20_control_bot/
 - `/setchannel [id]` - Change posting channel
 - `/broadcast [text]` - Send message to all groups
 
+### Group Management
+- `/welcome on/off` - Enable/disable welcome messages for new members
+- `/welcome status` - Check welcome message status
+- `/goodbye on/off` - Enable/disable goodbye messages for leaving members
+- `/goodbye status` - Check goodbye message status
+
 ### Auto-Posting System
 - `/autopost on` - Enable hourly posts
 - `/autopost off` - Disable auto-posting
