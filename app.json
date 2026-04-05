@@ -1,0 +1,35 @@
+{
+    "name": "t20_control_bot",
+    "description": "T20 Control Bot for Telegram with auto-posting, welcome/goodbye messages, and channel management.",
+    "repository": "https://github.com/ARNOLDT20/t20_control_bot",
+    "keywords": [
+        "telegram",
+        "bot",
+        "nodejs",
+        "heroku"
+    ],
+    "buildpacks": [
+        {
+            "url": "heroku/nodejs"
+        }
+    ],
+    "scripts": {},
+    "env": {
+        "TELEGRAM_TOKEN": {
+            "description": "Your Telegram bot token from BotFather",
+            "required": true
+        },
+        "CHANNEL_ID": {
+            "description": "The Telegram channel username or ID where the bot will post",
+            "required": true
+        },
+        "ADMIN_IDS": {
+            "description": "Comma-separated list of Telegram user IDs allowed to use admin commands",
+            "required": false
+        },
+        "SOCKS_PROXY": {
+            "description": "Optional SOCKS proxy URL, if needed",
+            "required": false
+        }
+    }
+}

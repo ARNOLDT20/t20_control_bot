@@ -161,3 +161,31 @@ ${styles.dividerLong}
         }
         process.exit(1);
     });
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('SIGINT', () => {
+    console.log('🔌 SIGINT received, shutting down gracefully...');
+    try {
+        bot.stopPolling();
+    } catch (err) {
+        console.error('Error stopping bot polling:', err);
+    }
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('🔌 SIGTERM received, shutting down gracefully...');
+    try {
+        bot.stopPolling();
+    } catch (err) {
+        console.error('Error stopping bot polling:', err);
+    }
+    process.exit(0);
+});
