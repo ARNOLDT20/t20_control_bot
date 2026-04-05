@@ -1,6 +1,7 @@
 // T20 Control Bot - Main Entry Point
 // Modular plugin-based architecture
 
+const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const { SocksProxyAgent } = require('socks-proxy-agent');
 const pluginLoader = require('./plugins');
@@ -8,12 +9,29 @@ const styles = require('./utils/styles');
 const blogFetcher = require('./utils/blogFetcher');
 const { TOKEN, CHANNEL_ID, ADMIN_IDS, PROXY_URL } = require('./config');
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
 if (!TOKEN) {
     console.error('Missing TELEGRAM_TOKEN environment variable. Set TELEGRAM_TOKEN and restart the bot.');
     process.exit(1);
 }
 
 const PROXY_AGENT = PROXY_URL ? new SocksProxyAgent(PROXY_URL) : null;
+
+// Health check endpoint for Heroku
+app.get('/', (req, res) => {
+    res.status(200).send('🤖 T20 Bot is alive!');
+});
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', bot: 'T20 Control Bot', timestamp: new Date().toISOString() });
+});
+
+// Start HTTP server
+const server = app.listen(PORT, () => {
+    console.log(`🌐 HTTP Server listening on port ${PORT}`);
+});
 
 // Helper function to check if user is admin
 const isAdmin = (userId) => {
@@ -170,18 +188,26 @@ process.on('SIGINT', () => {
     console.log('🔌 SIGINT received, shutting down gracefully...');
     try {
         bot.stopPolling();
+        server.close(() => {
+            console.log('✅ HTTP server closed');
+            process.exit(0);
+        });
     } catch (err) {
         console.error('Error stopping bot polling:', err);
+        process.exit(1);
     }
-    process.exit(0);
 });
 
 process.on('SIGTERM', () => {
     console.log('🔌 SIGTERM received, shutting down gracefully...');
     try {
         bot.stopPolling();
+        server.close(() => {
+            console.log('✅ HTTP server closed');
+            process.exit(0);
+        });
     } catch (err) {
         console.error('Error stopping bot polling:', err);
+        process.exit(1);
     }
-    process.exit(0);
 });
