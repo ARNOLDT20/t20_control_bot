@@ -75,7 +75,7 @@ ${styles.dividerLong}
         bot.sendMessage(msg.chat.id, reply, { parse_mode: 'HTML' });
     });
 
-    bot.onText(/\/menu/, (msg) => {
+    bot.onText(/\/menu/, async (msg) => {
         const menuText = `${styles.header('T20 CONTROL MENU', '📜')}
 Choose a command from the buttons below or type it manually.
 
@@ -106,15 +106,25 @@ Use <code>/welcome on/off</code> and <code>/goodbye on/off</code> to control mes
             ]
         ];
 
-        const options = {
-            caption: menuText,
-            parse_mode: 'HTML',
-            reply_markup: {
-                inline_keyboard: keyboard
-            }
-        };
-
-        bot.sendPhoto(msg.chat.id, 'https://files.catbox.moe/eycaql.png', options);
+        // Try to send photo with menu image, fallback to text if it fails
+        try {
+            await bot.sendPhoto(msg.chat.id, 'https://files.catbox.moe/eycaql.png', {
+                caption: menuText,
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: keyboard
+                }
+            });
+        } catch (error) {
+            console.error('Failed to send menu photo, using text fallback:', error.message);
+            // Fallback to text message with buttons
+            bot.sendMessage(msg.chat.id, menuText, {
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: keyboard
+                }
+            });
+        }
     });
 
     // === TOGGLE WELCOME MESSAGES ===
