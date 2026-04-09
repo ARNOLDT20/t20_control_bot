@@ -7,40 +7,30 @@ const styles = require('../utils/styles');
 // Function to get AI response from external API
 async function getAIResponse(message) {
     try {
-        // Try multiple potential API endpoints
-        const endpoints = [
-            'https://t20-classic-ai-chat.vercel.app/api/chat',
-            'https://api.t20-classic-ai-chat.vercel.app/chat',
-            'https://t20-classic-ai-chat.vercel.app/api/v1/chat'
-        ];
+        // Use T20 WOLF API
+        const endpoint = 'https://jqkciagpzjpmfypewkyg.supabase.co/functions/v1/t20-wolf-chat';
+        const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxa2NpYWdwempwbWZ5cGV3a3lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzYwMTcsImV4cCI6MjA5MTI1MjAxN30.XAANVCxwnFJm4_C5dnfXnd_nRd7MWP7lDxATnHUpOas';
 
-        for (const endpoint of endpoints) {
-            try {
-                const response = await axios.post(endpoint, {
-                    message: message,
-                    userId: 'telegram_bot_user'
-                }, {
-                    timeout: 8000, // 8 second timeout
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'T20-Control-Bot/1.0'
-                    }
-                });
-
-                if (response.data && (response.data.response || response.data.message || response.data.reply)) {
-                    return response.data.response || response.data.message || response.data.reply;
-                }
-            } catch (endpointError) {
-                // Continue to next endpoint
-                continue;
+        const response = await axios.post(endpoint, {
+            message: message
+        }, {
+            timeout: 15000, // 15 second timeout for AI responses
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'User-Agent': 'T20-Control-Bot/1.0'
             }
+        });
+
+        if (response.data && response.data.reply) {
+            return response.data.reply;
         }
 
-        // If all endpoints fail, use intelligent fallback
-        throw new Error('All API endpoints failed');
+        // If unexpected response format, use fallback
+        throw new Error('Unexpected API response format');
 
     } catch (error) {
-        console.error('Chatbot API error:', error.message);
+        console.error('T20 WOLF API error:', error.message);
 
         // Intelligent fallback responses based on message content
         return getIntelligentFallback(message);
@@ -154,12 +144,12 @@ module.exports = (bot) => {
         const query = match[1];
         const response = await getAIResponse(query);
 
-        const reply = `${styles.header('🤖 T20 Chatbot', '💬')}
+        const reply = `${styles.header('🤖 T20 WOLF AI Chatbot', '💬')}
 <i>Your AI Assistant</i>
 
 <b>You:</b> ${query}
 
-<b>T20 AI:</b> ${response}
+<b>T20 WOLF AI:</b> ${response}
 
 ${styles.dividerShort}
 💡 <i>Try asking me questions or type /menu for commands!</i>`;
@@ -173,7 +163,7 @@ ${styles.dividerShort}
         if (msg.chat.type === 'private' && !msg.text?.startsWith('/')) {
             const response = await getAIResponse(msg.text || '');
 
-            const reply = `${styles.header('🤖 T20 Chatbot', '💬')}
+            const reply = `${styles.header('🤖 T20 WOLF AI Chatbot', '💬')}
 <i>AI Conversation</i>
 
 <b>You:</b> ${msg.text}
@@ -189,28 +179,28 @@ ${styles.dividerShort}
 
     // Chatbot help command
     bot.onText(/\/chatbot/, async (msg) => {
-const helpText = `${styles.header('🤖 T20 AI Chatbot', '🧠')}
-<i>Intelligent Conversational Assistant</i>
+const helpText = `${styles.header('🤖 T20 WOLF AI Chatbot', '🐺🔥')}
+<i>Powered by T20 WOLF AI</i>
 
 ${styles.section('💬', 'Chat Commands', [
-    styles.listItem('💭', '/chat [message] — Talk to AI'),
-    styles.listItem('🤖', 'DM me directly — Auto chat mode'),
-    styles.listItem('❓', 'Ask questions — Get smart responses'),
+    styles.listItem('💭', '/chat [message] — Talk to T20 WOLF AI'),
+    styles.listItem('🤖', 'DM me directly — Auto AI chat mode'),
+    styles.listItem('❓', 'Ask questions — Get intelligent responses'),
     styles.listItem('🆘', '/chatbot — This help menu')
 ])}
 
-${styles.section('🧠', 'AI Features', [
+${styles.section('🐺', 'T20 WOLF AI Features', [
     styles.listItem('🎯', 'Natural conversations'),
-    styles.listItem('💡', 'Context-aware responses'),
-    styles.listItem('⚡', 'Real-time intelligent replies'),
-    styles.listItem('🔄', 'Advanced fallback system'),
-    styles.listItem('🌐', 'Multi-language support ready')
+    styles.listItem('💡', 'Smart question answering'),
+    styles.listItem('🌐', 'Powered by T20 WOLF AI'),
+    styles.listItem('⚡', 'Real-time AI responses'),
+    styles.listItem('🔥', 'Advanced AI capabilities')
 ])}
 
 ${styles.section('🔧', 'How It Works', [
-    styles.listItem('🔗', 'Primary: External AI API'),
+    styles.listItem('🔗', 'Primary: T20 WOLF AI API'),
     styles.listItem('🛡️', 'Fallback: Intelligent responses'),
-    styles.listItem('🎪', 'Pattern: Keyword recognition'),
+    styles.listItem('🎪', 'Pattern: Advanced AI processing'),
     styles.listItem('📚', 'Learning: Context awareness')
 ])}
 

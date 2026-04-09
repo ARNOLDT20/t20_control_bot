@@ -49,12 +49,12 @@ t20_control_bot/
 - `/broadcast [text]` - Send message to all groups
 
 ### Chatbot (AI Assistant)
-- `/chat [message]` - Talk to AI chatbot with intelligent responses
+- `/chat [message]` - Talk to T20 WOLF AI chatbot
 - `/chatbot` - Chatbot help and features
 - **DM Mode** - Direct message the bot for automatic AI responses
-- **Smart Responses** - Context-aware conversational AI with pattern recognition
-- **Intelligent Fallbacks** - Advanced response system when external API unavailable
-- **Multi-Context Support** - Handles greetings, questions, tech talk, and more
+- **T20 WOLF AI** - Powered by advanced T20 WOLF AI system
+- **Real AI Responses** - Live AI conversations with intelligent replies
+- **Supabase Integration** - Connected to T20 WOLF AI via Supabase functions
 
 ### Auto-Posting System
 - **5-Hour Interval** - Content posted every 5 hours automatically
@@ -102,12 +102,13 @@ Each plugin is a separate module that:
 
 ## 🌐 API Integrations
 
-### External AI Chatbot
-- **API Endpoint**: `https://t20-classic-ai-chat.vercel.app/api/chat` (currently unavailable)
-- **Method**: POST with JSON payload
-- **Features**: Intelligent fallback system with pattern recognition
-- **Fallback**: Advanced conversational AI with context awareness
-- **Status**: Using intelligent local responses until API is available
+### T20 WOLF AI Chatbot
+- **API Endpoint**: `https://jqkciagpzjpmfypewkyg.supabase.co/functions/v1/t20-wolf-chat`
+- **Method**: POST with JSON payload and Bearer token
+- **Features**: Real-time AI conversations, intelligent responses
+- **Authentication**: Supabase JWT Bearer token
+- **Response Format**: `{"reply": "AI response here"}`
+- **Fallback**: Intelligent local responses when API unavailable
 
 ### Auto-Posting System
 - **Interval**: 5 hours between posts
