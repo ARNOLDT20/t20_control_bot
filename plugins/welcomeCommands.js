@@ -153,24 +153,15 @@ ${styles.menuFooter('ARNOLD T20')}`;
                 ]
             ];
 
-            // Try to send photo with menu image, fallback to text if it fails
-            try {
-                await bot.sendPhoto(msg.chat.id, 'https://files.catbox.moe/fruf4o.png', {
-                    caption: menuText,
-                    parse_mode: 'HTML',
-                    reply_markup: {
-                        inline_keyboard: keyboard
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to send menu photo, using text fallback:', error.message);
-                await bot.sendMessage(msg.chat.id, menuText, {
-                    parse_mode: 'HTML',
-                    reply_markup: {
-                        inline_keyboard: keyboard
-                    }
-                });
-            }
+            // Send the royal menu with beautiful text formatting and image link
+            const menuWithImageLink = menuText + '\n\n<a href="https://files.catbox.moe/fruf4o.png">👑 View Royal Menu Image</a>';
+
+            await bot.sendMessage(msg.chat.id, menuWithImageLink, {
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: keyboard
+                }
+            });
         } catch (error) {
             console.error('Error generating menu:', error);
             await bot.sendMessage(msg.chat.id, '❌ Failed to generate menu', { parse_mode: 'HTML' });
