@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const styles = require('../utils/styles');
+const { getGroupSettings, setGroupSetting } = require('../utils/sharedSettings');
 
 let sharp;
 try {
@@ -12,16 +13,7 @@ try {
 }
 
 // Settings to control welcome/goodbye messages per chat
-const settings = {};
-
-module.exports = (bot, groups, botStartTime) => {
-
-    const getSettings = (chatId) => {
-        if (!settings[chatId]) {
-            settings[chatId] = { welcome: true, goodbye: true };
-        }
-        return settings[chatId];
-    };
+// Moved to settings.js
 
     bot.on('message', async (msg) => {
 
@@ -31,7 +23,7 @@ module.exports = (bot, groups, botStartTime) => {
             groups.push(msg.chat.id);
         }
 
-        const chatSettings = getSettings(msg.chat.id);
+        const chatSettings = getGroupSettings(msg.chat.id);
 
         // ================== 🔥 PREMIUM WELCOME ==================
         if (msg.new_chat_members && msg.new_chat_members.length && chatSettings.welcome) {
@@ -103,13 +95,7 @@ ${styles.dividerLong}
     });
 
     // ================== PING ==================
-    bot.onText(/\/ping/, (msg) => {
-        const latencyMs = Date.now() - (msg.date * 1000);
-        bot.sendMessage(msg.chat.id,
-            `🏓 <b>PONG!</b>\n⚡ ${latencyMs} ms\n🟢 Online`,
-            { parse_mode: 'HTML' }
-        );
-    });
+    // Moved to ping.js
 
     // ================== MENU ==================
     bot.onText(/\/menu/, async (msg) => {
@@ -141,11 +127,17 @@ ${styles.dividerLong}
                 inline_keyboard: [
                     [
                         { text: '🚀 Start', callback_data: '/start' },
-                        { text: '📊 Stats', callback_data: '/stats' }
+                        { text: '📊 Stats', callback_data: '/stats' },
+                        { text: '🏓 Ping', callback_data: '/ping' }
                     ],
                     [
+                        { text: '🆔 ID', callback_data: '/id' },
                         { text: '❓ Help', callback_data: '/help' },
                         { text: '⚙️ Settings', callback_data: '/settings' }
+                    ],
+                    [
+                        { text: '🔧 Admin Panel', callback_data: '/admin' },
+                        { text: '📢 Channel Panel', callback_data: '/channel' }
                     ]
                 ]
             };
@@ -190,17 +182,7 @@ ${styles.dividerLong}
     });
 
     // ================== TOGGLES ==================
-    bot.onText(/\/welcome\s+(on|off)/, (msg, match) => {
-        const s = getSettings(msg.chat.id);
-        s.welcome = match[1] === 'on';
-        bot.sendMessage(msg.chat.id, `✅ Welcome ${s.welcome ? 'enabled' : 'disabled'}`, { parse_mode: 'HTML' });
-    });
-
-    bot.onText(/\/goodbye\s+(on|off)/, (msg, match) => {
-        const s = getSettings(msg.chat.id);
-        s.goodbye = match[1] === 'on';
-        bot.sendMessage(msg.chat.id, `✅ Goodbye ${s.goodbye ? 'enabled' : 'disabled'}`, { parse_mode: 'HTML' });
-    });
+    // Moved to settings.js
 
     // ================== CALLBACK ==================
     bot.on('callback_query', async (q) => {
@@ -220,6 +202,32 @@ ${styles.dividerLong}
 
         if (q.data === '/settings') {
             bot.sendMessage(q.message.chat.id, '⚙️ Use /settings to manage bot options.');
+        }
+
+        if (q.data === '/ping') {
+            const latencyMs = Date.now() - (q.message.date * 1000);
+            bot.sendMessage(q.message.chat.id, `🏓 <b>PONG!</b>\n⚡ ${latencyMs} ms\n🟢 Online`, { parse_mode: 'HTML' });
+        }
+
+        if (q.data === '/id') {
+            const info = `${styles.header('User & Chat Info', '👤')}
+${styles.listItem('🆔', `ID: ${styles.code(q.from.id)}`)}
+${styles.listItem('📝', `Name: ${q.from.first_name}${q.from.last_name ? ' ' + q.from.last_name : ''}`)}
+${styles.listItem('👤', `Username: ${q.from.username ? '@' + q.from.username : 'None'}`)}
+
+${styles.header('Chat Details', '💬')}
+${styles.listItem('🔖', `Chat ID: ${styles.code(q.message.chat.id)}`)}
+${styles.listItem('📌', `Type: ${q.message.chat.type}`)}`;
+
+            bot.sendMessage(q.message.chat.id, info, { parse_mode: 'HTML' });
+        }
+
+        if (q.data === '/admin') {
+            bot.sendMessage(q.message.chat.id, '🔧 Admin commands: /kick, /ban, /mute, /unban, /unmute');
+        }
+
+        if (q.data === '/channel') {
+            bot.sendMessage(q.message.chat.id, '📢 Channel commands: /post [text], /broadcast');
         }
     });
 };

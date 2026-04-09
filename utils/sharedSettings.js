@@ -10,7 +10,8 @@ const getGroupSettings = (chatId) => {
             prefix: '/',
             language: 'en',
             antiSpam: false,
-            welcomeMsg: true,
+            welcome: true,
+            goodbye: true,
             chatbot: true
         };
     }
@@ -32,7 +33,8 @@ const resetGroupSettings = (chatId) => {
         prefix: '/',
         language: 'en',
         antiSpam: false,
-        welcomeMsg: true,
+        welcome: true,
+        goodbye: true,
         chatbot: true
     };
     return groupSettings[chatId];

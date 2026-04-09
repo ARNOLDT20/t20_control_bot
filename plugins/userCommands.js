@@ -2,20 +2,6 @@
 const styles = require('../utils/styles');
 
 module.exports = (bot) => {
-    // === GET CHAT ID ===
-    bot.onText(/\/id/, (msg) => {
-        const info = `${styles.header('User & Chat Info', '👤')}
-${styles.listItem('🆔', `ID: ${styles.code(msg.from.id)}`)}
-${styles.listItem('📝', `Name: ${msg.from.first_name}${msg.from.last_name ? ' ' + msg.from.last_name : ''}`)}
-${styles.listItem('👤', `Username: ${msg.from.username ? '@' + msg.from.username : 'None'}`)}
-
-${styles.header('Chat Details', '💬')}
-${styles.listItem('🔖', `Chat ID: ${styles.code(msg.chat.id)}`)}
-${styles.listItem('📌', `Type: ${msg.chat.type}`)}`;
-
-        bot.sendMessage(msg.chat.id, info, { parse_mode: 'HTML' });
-    });
-
     // === USER INFO ===
     bot.onText(/\/userinfo/, (msg) => {
         if (msg.reply_to_message) {
@@ -32,18 +18,6 @@ ${styles.listItem('🌐', `Language: ${user.language_code || 'N/A'}`)}`;
         } else {
             bot.sendMessage(msg.chat.id, '📝 Reply to a message to get user info.', { parse_mode: 'HTML' });
         }
-    });
-
-    // === STATS ===
-    bot.onText(/\/stats/, (msg) => {
-        const stats = `${styles.header('Bot Statistics', '📊')}
-${styles.listItem('👥', `Groups Tracked: <b>${msg.context?.groups?.length || 0}</b>`)}
-${styles.listItem('🔑', `Admins Configured: <b>${msg.context?.adminCount || 0}</b>`)}
-${styles.listItem('📢', `Channel: <b>${msg.context?.channelId}</b>`)}
-${styles.listItem('🟢', `Status: Online`)}
-${styles.divider}`;
-
-        bot.sendMessage(msg.chat.id, stats, { parse_mode: 'HTML' });
     });
 
     // === ECHO ===

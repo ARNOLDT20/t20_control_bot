@@ -10,8 +10,13 @@ const welcomeCommands = require('./welcomeCommands');
 const funCommands = require('./funCommands');
 const infoCommands = require('./infoCommands');
 const moderationCommands = require('./moderationCommands');
-const settingsCommands = require('./settingsCommands');
 const chatbot = require('./chatbot');
+const ping = require('./ping');
+const id = require('./id');
+const stats = require('./stats');
+const help = require('./help');
+const settings = require('./settings');
+const start = require('./start');
 
 module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
@@ -36,8 +41,23 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     welcomeCommands(bot, groups, botStartTime);
     console.log('✅ Welcome commands loaded');
 
-    const autoPosting = autoPostingCommands(bot, isAdmin, channelId);
-    console.log('✅ Auto-posting commands loaded');
+    ping(bot);
+    console.log('✅ Ping command loaded');
+
+    id(bot);
+    console.log('✅ ID command loaded');
+
+    stats(bot, groups, adminIds.length, channelId);
+    console.log('✅ Stats command loaded');
+
+    help(bot);
+    console.log('✅ Help command loaded');
+
+    settings(bot);
+    console.log('✅ Settings command loaded');
+
+    start(bot);
+    console.log('✅ Start command loaded');
 
     adminManagement(bot, isAdmin, adminIds);
     console.log('✅ Admin management loaded');
@@ -50,9 +70,6 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
 
     moderationCommands(bot, isAdmin);
     console.log('✅ Moderation commands loaded');
-
-    settingsCommands(bot, isAdmin);
-    console.log('✅ Settings commands loaded');
 
     chatbot(bot);
     console.log('✅ Chatbot loaded');
