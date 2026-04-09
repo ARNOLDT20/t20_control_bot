@@ -119,10 +119,12 @@ ${styles.dividerLong}
             const uptime = Date.now() - botStartTime;
 
             const menuText = `
+⚠️ <b>BOT INFO</b> • <i>Prefix: /</i> • <b>T20 WOLF CONTROL</b>
+
 🐺🔥 <b>T20 WOLF CONTROL</b> 🔥🐺
 
-⚡️ Status: Online  
-⏱️ Uptime: ${styles.formatUptime(uptime)}  
+⚡️ <b>Status:</b> Online  
+⏱️ <b>Uptime:</b> ${styles.formatUptime(uptime)}  
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -137,8 +139,14 @@ ${styles.dividerLong}
 
             const keyboard = {
                 inline_keyboard: [
-                    [{ text: '🚀 Start', callback_data: '/start' }],
-                    [{ text: '📊 Stats', callback_data: '/stats' }]
+                    [
+                        { text: '🚀 Start', callback_data: '/start' },
+                        { text: '📊 Stats', callback_data: '/stats' }
+                    ],
+                    [
+                        { text: '❓ Help', callback_data: '/help' },
+                        { text: '⚙️ Settings', callback_data: '/settings' }
+                    ]
                 ]
             };
 
@@ -199,11 +207,19 @@ ${styles.dividerLong}
         bot.answerCallbackQuery(q.id);
 
         if (q.data === '/start') {
-            bot.sendMessage(q.message.chat.id, '🚀 Use /start');
+            bot.sendMessage(q.message.chat.id, '🚀 Use /start to launch the bot.');
         }
 
         if (q.data === '/stats') {
             bot.sendMessage(q.message.chat.id, '📊 Stats coming soon...');
+        }
+
+        if (q.data === '/help') {
+            bot.sendMessage(q.message.chat.id, '❓ Use /help to see available commands.');
+        }
+
+        if (q.data === '/settings') {
+            bot.sendMessage(q.message.chat.id, '⚙️ Use /settings to manage bot options.');
         }
     });
 };
