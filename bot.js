@@ -78,56 +78,84 @@ bot.getMe()
 
         // Setup /start command (slightly enhanced header only)
         bot.onText(/\/start/, (msg) => {
-            const helpText = `
-🐺🔥 <b>T20 CONTROL BOT v3.0</b> 🔥🐺
-<i>The Ultimate Telegram Power System</i>
+            const helpText = `${styles.header('T20 CONTROL BOT v3.0', '🤖')}
+<i>The Ultimate Telegram Group Management System</i>
 ${styles.dividerLong}
 
 ${styles.section('👤', 'User Commands', [
-                styles.listItem('/id', 'Show your user & chat ID'),
-                styles.listItem('/userinfo', 'Get user info (reply to message)'),
-                styles.listItem('/stats', 'Bot statistics'),
-                styles.listItem('/echo [text]', 'Echo back your message'),
-                styles.listItem('/ping', 'Check latency and bot status'),
-                styles.listItem('/help', 'Show help'),
+                styles.listItem('🆔', '/id — Your user & chat ID'),
+                styles.listItem('👨‍💼', '/userinfo — Get user info (reply)'),
+                styles.listItem('📊', '/stats — Bot statistics'),
+                styles.listItem('🔊', '/echo — Echo back text'),
+                styles.listItem('🏓', '/ping — Check latency'),
+                styles.listItem('👥', '/groupinfo — Group information'),
+                styles.listItem('👨‍👩‍👦', '/members — Count members'),
+                styles.listItem('💳', '/profile — Your profile'),
+            ])}
+
+${styles.section('🎮', 'Fun Commands', [
+                styles.listItem('🎱', '/8ball — Magic 8 ball'),
+                styles.listItem('🎲', '/roll — Roll dice'),
+                styles.listItem('🪙', '/flip — Flip coin'),
+                styles.listItem('🎯', '/choose — Choose from options'),
+                styles.listItem('⭐', '/rate — Rate something'),
+                styles.listItem('😂', '/joke — Get a joke'),
+                styles.listItem('🔄', '/reverse — Reverse text'),
+                styles.listItem('🔤', '/upper, /lower — Case change'),
             ])}
 
 ${styles.section('🔧', 'Admin Commands', [
-                styles.listItem('/kick', 'Kick user (reply to message)'),
-                styles.listItem('/ban', 'Ban user (reply to message)'),
-                styles.listItem('/unban [user_id]', 'Unban user'),
-                styles.listItem('/mute', 'Mute user (reply to message)'),
-                styles.listItem('/unmute', 'Unmute user (reply to message)'),
-                styles.listItem('/delete', 'Delete message (reply to message)'),
-                styles.listItem('/pin', 'Pin message (reply to message)'),
+                styles.listItem('🚫', '/kick — Kick user (reply)'),
+                styles.listItem('⛔', '/ban — Ban user (reply)'),
+                styles.listItem('✅', '/unban — Unban user'),
+                styles.listItem('🔇', '/mute — Mute user (reply)'),
+                styles.listItem('🔊', '/unmute — Unmute user (reply)'),
+                styles.listItem('🗑️', '/delete — Delete message (reply)'),
+                styles.listItem('📌', '/pin — Pin message (reply)'),
+                styles.listItem('📌', '/unpin — Unpin message (reply)'),
+            ])}
+
+${styles.section('⚠️', 'Moderation', [
+                styles.listItem('⚠️', '/warn — Warn user (reply)'),
+                styles.listItem('📊', '/warnings — Check warnings'),
+                styles.listItem('🧹', '/clearwarn — Clear warnings'),
+                styles.listItem('⏱️', '/timeout — Mute for time'),
+                styles.listItem('🔄', '/softban — Kick user'),
+            ])}
+
+${styles.section('⚙️', 'Settings', [
+                styles.listItem('🎛️', '/settings — View settings'),
+                styles.listItem('🌐', '/setlang — Set language'),
+                styles.listItem('🛡️', '/antispam — Toggle anti-spam'),
+                styles.listItem('👋', '/togglewelcome — Welcome toggle'),
+                styles.listItem('📋', '/setrules — Set group rules'),
+                styles.listItem('📋', '/rules — View rules'),
             ])}
 
 ${styles.section('📢', 'Channel Commands', [
-                styles.listItem('/post [text]', 'Post to channel'),
-                styles.listItem('/testchannel', 'Test channel connection'),
-                styles.listItem('/setchannel [id]', 'Set posting channel'),
-                styles.listItem('/broadcast [text]', 'Send to all groups'),
+                styles.listItem('📝', '/post — Post to channel'),
+                styles.listItem('🧪', '/testchannel — Test connection'),
+                styles.listItem('📡', '/broadcast — Send to all groups'),
             ])}
 
 ${styles.section('📅', 'Auto-Posting', [
-                styles.listItem('/autopost on', 'Enable auto-posting'),
-                styles.listItem('/autopost off', 'Disable auto-posting'),
-                styles.listItem('/autopost now', 'Post immediately'),
-                styles.listItem('/autopost status', 'Check status'),
+                styles.listItem('▶️', '/autopost on — Enable'),
+                styles.listItem('⏹️', '/autopost off — Disable'),
+                styles.listItem('⏰', '/autopost now — Post now'),
+                styles.listItem('📊', '/autopost status — Check status'),
             ])}
 
 ${styles.section('👥', 'Group Management', [
-                styles.listItem('/welcome on/off', 'Toggle welcome messages'),
-                styles.listItem('/welcome status', 'Check welcome status'),
-                styles.listItem('/goodbye on/off', 'Toggle goodbye messages'),
-                styles.listItem('/goodbye status', 'Check goodbye status'),
-                styles.listItem('/testwelcome', 'Test welcome message'),
-                styles.listItem('/testgoodbye', 'Test goodbye message'),
+                styles.listItem('👋', '/welcome on/off toggle'),
+                styles.listItem('🌙', '/goodbye on/off toggle'),
+                styles.listItem('🧪', '/testwelcome — Test welcome'),
+                styles.listItem('🧪', '/testgoodbye — Test goodbye'),
             ])}
 
-${styles.section('⚙️', 'System', [
-                styles.listItem('/menu', 'Show command menu'),
-                styles.listItem('/admin list', 'Show admins'),
+${styles.section('🎯', 'System', [
+                styles.listItem('🗂️', '/menu — Command menu'),
+                styles.listItem('👮', '/admin list — Show admins'),
+                styles.listItem('❓', '/help — Bot help'),
             ])}
 
 ${styles.dividerLong}

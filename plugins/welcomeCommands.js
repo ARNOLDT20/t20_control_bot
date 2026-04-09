@@ -96,7 +96,7 @@ ${styles.dividerLong}
 ${styles.menuInfo('Mᴏᴅᴇ', 'public')}
 ${styles.menuInfo('Pʀᴇғɪx', '/')}
 ${styles.menuInfo('Usᴇʀ', `@${me.id}`)}
-${styles.menuInfo('Cᴏᴍᴍᴀɴᴅs', '500')}
+${styles.menuInfo('Cᴏᴍᴍᴀɴᴅs', '50+')}
 ${styles.menuInfo('Uᴘᴛɪᴍᴇ', uptimeStr)}
 ${styles.menuInfo('Tɪᴍᴇ', timeStr)}
 ${styles.menuInfo('Dᴀᴛᴇ', dateStr)}
@@ -104,42 +104,63 @@ ${styles.menuInfo('Pʟᴀᴛғᴏʀᴍ', 'Linux')}
 ${styles.menuInfo('Rᴀᴍ', '93%')}
 ${styles.menuClosing()}
 
-🎮 GROUP MANAGING BOT
+🎮 GROUP MANAGEMENT BOT
 ${styles.menuDivider()}
 
-📋 <b>Main Categories:</b>
-${styles.menuItem('💰', 'Economy System')}
-${styles.menuItem('🃏', 'Card Collection')}
-${styles.menuItem('⚔️', 'PVP Combat')}
+${styles.menuCategory('👤', '<b>User Commands</b>')}
+${styles.menuItem('🆔', 'ID Info • User Info • Stats')}
+${styles.menuItem('🏓', 'Ping • Echo • Profile')}
 
-Type <code>/menu &lt;category&gt;</code> to view commands
+${styles.menuCategory('🎮', '<b>Fun Commands</b>')}
+${styles.menuItem('🎲', '8Ball • Dice • Coin Flip')}
+${styles.menuItem('🎯', 'Choose • Rate • Joke • Reverse')}
+
+${styles.menuCategory('🔧', '<b>Admin Commands</b>')}
+${styles.menuItem('🚫', 'Kick • Ban • Unban • Mute')}
+${styles.menuItem('🗑️', 'Delete • Pin • Unpin')}
+
+${styles.menuCategory('⚠️', '<b>Moderation</b>')}
+${styles.menuItem('📊', 'Warn • Warnings • ClearWarn')}
+${styles.menuItem('⏱️', 'Timeout • Softban • SetDesc')}
+
+${styles.menuCategory('⚙️', '<b>Settings</b>')}
+${styles.menuItem('🎛️', 'Settings • SetLang • AntiSpam')}
+${styles.menuItem('📋', 'SetRules • Rules')}
+
+${styles.menuCategory('📢', '<b>Channel & Posts</b>')}
+${styles.menuItem('📝', 'Post • Broadcast • TestChannel')}
+
+${styles.menuCategory('👥', '<b>Group Management</b>')}
+${styles.menuItem('👋', 'Welcome • Goodbye • Test')}
+
+${styles.menuDivider()}
+Type <code>/start</code> for full help or <code>/help</code> for support
 
 ${styles.menuFooter('ʜᴏʀʟᴀ-ᴘᴏᴏᴋɪᴇ')}`;
 
             const keyboard = [
                 [
-                    { text: 'Start', callback_data: '/start' },
-                    { text: 'Menu', callback_data: '/menu' }
+                    { text: '🏠 Start', callback_data: '/start' },
+                    { text: '📚 Help', callback_data: '/help' }
                 ],
                 [
-                    { text: 'Help', callback_data: '/help' },
-                    { text: 'Ping', callback_data: '/ping' }
+                    { text: '👤 User Info', callback_data: '/id' },
+                    { text: '🏓 Ping', callback_data: '/ping' }
                 ],
                 [
-                    { text: 'My ID', callback_data: '/id' },
-                    { text: 'Post', callback_data: '/post' }
+                    { text: '🎮 Fun', callback_data: '/joke' },
+                    { text: '⚙️ Settings', callback_data: '/settings' }
                 ],
                 [
-                    { text: 'Autopost', callback_data: '/autopost' },
-                    { text: 'Admins', callback_data: '/admin list' }
+                    { text: '👥 Group Info', callback_data: '/groupinfo' },
+                    { text: '📊 Members', callback_data: '/members' }
                 ],
                 [
-                    { text: 'Welcome status', callback_data: '/welcome status' },
-                    { text: 'Goodbye status', callback_data: '/goodbye status' }
+                    { text: '🔧 Admin', callback_data: '/admin list' },
+                    { text: '🗂️ Rules', callback_data: '/rules' }
                 ],
                 [
-                    { text: 'Test welcome', callback_data: '/testwelcome' },
-                    { text: 'Test goodbye', callback_data: '/testgoodbye' }
+                    { text: '📋 All Commands', callback_data: '/start' }
                 ]
             ];
 
@@ -367,6 +388,56 @@ ${styles.dividerLong}
 ✨ <i>If you want back in, ask an admin for a fresh invite.</i>
 `;
                     await bot.sendMessage(chatId, testGoodbyeText, { parse_mode: 'HTML' });
+                    break;
+
+                case '/groupinfo':
+                    bot.emit('message', {
+                        message_id: query.message.message_id,
+                        from: query.from,
+                        chat: query.message.chat,
+                        date: query.message.date,
+                        text: '/groupinfo'
+                    });
+                    break;
+
+                case '/members':
+                    bot.emit('message', {
+                        message_id: query.message.message_id,
+                        from: query.from,
+                        chat: query.message.chat,
+                        date: query.message.date,
+                        text: '/members'
+                    });
+                    break;
+
+                case '/settings':
+                    bot.emit('message', {
+                        message_id: query.message.message_id,
+                        from: query.from,
+                        chat: query.message.chat,
+                        date: query.message.date,
+                        text: '/settings'
+                    });
+                    break;
+
+                case '/joke':
+                    bot.emit('message', {
+                        message_id: query.message.message_id,
+                        from: query.from,
+                        chat: query.message.chat,
+                        date: query.message.date,
+                        text: '/joke'
+                    });
+                    break;
+
+                case '/rules':
+                    bot.emit('message', {
+                        message_id: query.message.message_id,
+                        from: query.from,
+                        chat: query.message.chat,
+                        date: query.message.date,
+                        text: '/rules'
+                    });
                     break;
             }
 

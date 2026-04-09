@@ -7,6 +7,10 @@ const channelCommands = require('./channelCommands');
 const autoPostingCommands = require('./autoPostingCommands');
 const adminManagement = require('./adminManagement');
 const welcomeCommands = require('./welcomeCommands');
+const funCommands = require('./funCommands');
+const infoCommands = require('./infoCommands');
+const moderationCommands = require('./moderationCommands');
+const settingsCommands = require('./settingsCommands');
 
 module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
@@ -36,6 +40,18 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
 
     adminManagement(bot, isAdmin, adminIds);
     console.log('✅ Admin management loaded');
+
+    funCommands(bot);
+    console.log('✅ Fun commands loaded');
+
+    infoCommands(bot);
+    console.log('✅ Info commands loaded');
+
+    moderationCommands(bot, isAdmin);
+    console.log('✅ Moderation commands loaded');
+
+    settingsCommands(bot, isAdmin);
+    console.log('✅ Settings commands loaded');
 
     console.log('✨ All plugins loaded successfully!');
 
