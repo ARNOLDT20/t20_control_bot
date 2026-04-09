@@ -121,17 +121,17 @@ ${styles.dividerLong}
             const menuText = `
 🐺🔥 <b>T20 WOLF CONTROL</b> 🔥🐺
 
-⚡ Status: Online  
-⏱ Uptime: ${styles.formatUptime(uptime)}  
+⚡️ Status: Online  
+⏱️ Uptime: ${styles.formatUptime(uptime)}  
 
-${styles.dividerLong}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 👤 <b>User</b> → /id /stats /ping  
 🔧 <b>Admin</b> → /kick /ban /mute  
 📢 <b>Channel</b> → /post /broadcast  
 ⚙️ <b>System</b> → /settings  
 
-${styles.dividerLong}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💡 Type /start for full commands
 `;
 
@@ -159,14 +159,16 @@ ${styles.dividerLong}
                 }
 
                 await bot.sendPhoto(msg.chat.id, sendPath, {
-                    caption: '🐺 T20 WOLF MENU',
-                    parse_mode: 'HTML'
+                    caption: menuText,
+                    parse_mode: 'HTML',
+                    reply_markup: keyboard
                 });
 
                 if (temp && fs.existsSync(temp)) fs.unlinkSync(temp);
+                return;
 
             } catch (e) {
-                console.log('Image fallback');
+                console.log('Image fallback', e.message || e);
             }
 
             await bot.sendMessage(msg.chat.id, menuText, {
