@@ -10,7 +10,8 @@ const getGroupSettings = (chatId) => {
             prefix: '/',
             language: 'en',
             antiSpam: false,
-            welcomeMsg: true
+            welcomeMsg: true,
+            chatbot: true
         };
     }
     return groupSettings[chatId];
@@ -30,6 +31,7 @@ ${styles.listItem('📍', `Prefix: <code>${settings.prefix}</code>`)}
 ${styles.listItem('🌐', `Language: <b>${settings.language}</b>`)}
 ${styles.listItem('🛡️', `Anti-Spam: ${settings.antiSpam ? '✅ ON' : '❌ OFF'}`)}
 ${styles.listItem('👋', `Welcome Msg: ${settings.welcomeMsg ? '✅ ON' : '❌ OFF'}`)}
+${styles.listItem('🤖', `Chatbot: ${settings.chatbot ? '✅ ON' : '❌ OFF'}`)}
 ${styles.divider}
 Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
 
