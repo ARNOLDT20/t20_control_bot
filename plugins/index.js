@@ -11,6 +11,7 @@ const funCommands = require('./funCommands');
 const infoCommands = require('./infoCommands');
 const moderationCommands = require('./moderationCommands');
 const settingsCommands = require('./settingsCommands');
+const chatbot = require('./chatbot');
 
 module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
@@ -52,6 +53,9 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
 
     settingsCommands(bot, isAdmin);
     console.log('✅ Settings commands loaded');
+
+    chatbot(bot);
+    console.log('✅ Chatbot loaded');
 
     console.log('✨ All plugins loaded successfully!');
 

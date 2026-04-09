@@ -132,6 +132,12 @@ ${styles.section('⚙️', 'Settings', [
                 styles.listItem('📋', '/rules — View rules'),
             ])}
 
+${styles.section('🤖', 'Chatbot', [
+                styles.listItem('💬', '/chat [message] — Talk to AI'),
+                styles.listItem('🤖', '/chatbot — Chatbot help'),
+                styles.listItem('🧠', 'DM me — Auto chat mode'),
+            ])}
+
 ${styles.section('📢', 'Channel Commands', [
                 styles.listItem('📝', '/post — Post to channel'),
                 styles.listItem('🧪', '/testchannel — Test connection'),

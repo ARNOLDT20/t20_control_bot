@@ -100,7 +100,7 @@ const styles = {
         const minutes = Math.floor(seconds / 60);
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
-        
+
         if (days > 0) {
             return `${days}d ${hours % 24}h ${minutes % 60}m`;
         } else if (hours > 0) {
@@ -115,21 +115,21 @@ const styles = {
     // Format time nicely
     formatTime: () => {
         const now = new Date();
-        return now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
+        return now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
             second: '2-digit',
-            hour12: true 
+            hour12: true
         });
     },
 
     // Format date nicely
     formatDate: () => {
         const now = new Date();
-        return now.toLocaleDateString('en-US', { 
-            month: '2-digit', 
-            day: '2-digit', 
-            year: 'numeric' 
+        return now.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
         });
     },
 };

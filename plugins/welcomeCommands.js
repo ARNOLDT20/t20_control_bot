@@ -79,18 +79,18 @@ ${styles.dividerLong}
         try {
             // Get bot info
             const me = await bot.getMe();
-            
+
             // Calculate uptime
             const uptime = Date.now() - botStartTime;
             const uptimeStr = styles.formatUptime(uptime);
-            
+
             // Get current time and date
             const timeStr = styles.formatTime();
             const dateStr = styles.formatDate();
-            
+
             // Build the styled menu
             const botName = `${me.first_name || 'T20'} ${me.last_name || ''}`.trim().toUpperCase();
-            
+
             const menuText = `${styles.menuHeader(botName)}
 
 ${styles.menuInfo('Mᴏᴅᴇ', 'public')}
@@ -122,6 +122,9 @@ ${styles.menuItem('📊', 'Warn • Timeout • Softban')}
 ${styles.menuCategory('⚙️', '<b>Settings</b>')}
 ${styles.menuItem('🎛️', 'Config • Rules • AntiSpam')}
 
+${styles.menuCategory('🤖', '<b>Chatbot</b>')}
+${styles.menuItem('💬', 'AI Chat • Smart Responses')}
+
 ${styles.menuDivider()}
 Type <code>/start</code> for all commands
 
@@ -141,7 +144,7 @@ ${styles.menuFooter('ARNOLD T20')}`;
                     { text: '⚙️ Settings', callback_data: '/settings' }
                 ],
                 [
-                    { text: '👥 Group Info', callback_data: '/groupinfo' },
+                    { text: '🤖 Chatbot', callback_data: '/chatbot' },
                     { text: '📊 Members', callback_data: '/members' }
                 ],
                 [
@@ -153,15 +156,33 @@ ${styles.menuFooter('ARNOLD T20')}`;
                 ]
             ];
 
-            // Send the royal menu with beautiful text formatting and image link
-            const menuWithImageLink = menuText + '\n\n<a href="https://files.catbox.moe/fruf4o.png">👑 View Royal Menu Image</a>';
+            // Send the royal menu image first, then the menu details
+            try {
+                // Send the menu image
+                await bot.sendPhoto(msg.chat.id, 'menu_images/royal_menu.png', {
+                    caption: '👑 Welcome to ARNOLD T20 Royal Command Center 👑',
+                    parse_mode: 'HTML'
+                });
 
-            await bot.sendMessage(msg.chat.id, menuWithImageLink, {
-                parse_mode: 'HTML',
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
-            });
+                // Then send the menu details
+                await bot.sendMessage(msg.chat.id, menuText, {
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: keyboard
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to send menu image, using text fallback:', error.message);
+                // Fallback to text-only menu if image fails
+                const menuWithImageLink = menuText + '\n\n<a href="https://files.catbox.moe/fruf4o.png">👑 View Royal Menu Image</a>';
+
+                await bot.sendMessage(msg.chat.id, menuWithImageLink, {
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: keyboard
+                    }
+                });
+            }
         } catch (error) {
             console.error('Error generating menu:', error);
             await bot.sendMessage(msg.chat.id, '❌ Failed to generate menu', { parse_mode: 'HTML' });

@@ -27,15 +27,15 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             const userId = msg.reply_to_message.from.id;
             const userName = msg.reply_to_message.from.first_name;
             const warningCount = addWarning(msg.chat.id, userId);
-            
+
             const response = `⚠️ <b>${userName}</b> has been warned!\n\n📊 <b>Warnings: ${warningCount}/3</b>\n\n${warningCount >= 3 ? '🔴 User will be kicked on next warning!' : ''}`;
             bot.sendMessage(msg.chat.id, response, { parse_mode: 'HTML' });
-            
+
             if (warningCount >= 3) {
                 bot.banChatMember(msg.chat.id, userId)
                     .then(() => bot.unbanChatMember(msg.chat.id, userId))
@@ -56,12 +56,12 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             const userId = msg.reply_to_message.from.id;
             const userName = msg.reply_to_message.from.first_name;
             const warningCount = getWarnings(msg.chat.id, userId);
-            
+
             const response = `📊 <b>${userName}</b>\n\n⚠️ Warnings: <b>${warningCount}/3</b>`;
             bot.sendMessage(msg.chat.id, response, { parse_mode: 'HTML' });
         } else {
@@ -75,12 +75,12 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             const userId = msg.reply_to_message.from.id;
             const userName = msg.reply_to_message.from.first_name;
             clearWarnings(msg.chat.id, userId);
-            
+
             bot.sendMessage(msg.chat.id, styles.successMsg(`Warnings cleared for <b>${userName}</b>.`), { parse_mode: 'HTML' });
         } else {
             bot.sendMessage(msg.chat.id, '📝 Reply to a message to clear warnings.', { parse_mode: 'HTML' });
@@ -93,14 +93,14 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             const userId = msg.reply_to_message.from.id;
             const userName = msg.reply_to_message.from.first_name;
             const minutes = parseInt(match[1]);
             const seconds = minutes * 60;
-            
-            bot.restrictChatMember(msg.chat.id, userId, { 
+
+            bot.restrictChatMember(msg.chat.id, userId, {
                 can_send_messages: false,
                 until_date: Math.floor(Date.now() / 1000) + seconds
             })
@@ -119,11 +119,11 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             const userId = msg.reply_to_message.from.id;
             const userName = msg.reply_to_message.from.first_name;
-            
+
             bot.banChatMember(msg.chat.id, userId)
                 .then(() => bot.unbanChatMember(msg.chat.id, userId))
                 .then(() => {
@@ -141,7 +141,7 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         if (msg.reply_to_message) {
             bot.unpinChatMessage(msg.chat.id, msg.reply_to_message.message_id)
                 .then(() => bot.sendMessage(msg.chat.id, styles.successMsg('Message has been unpinned.'), { parse_mode: 'HTML' }))
@@ -157,7 +157,7 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const desc = match[1];
         bot.setChatDescription(msg.chat.id, desc)
             .then(() => bot.sendMessage(msg.chat.id, styles.successMsg('Group description updated!'), { parse_mode: 'HTML' }))

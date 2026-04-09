@@ -18,8 +18,8 @@ console.log(`✅ Admins: ${ADMIN_IDS.length} configured`);
 
 // Create mock bot object for testing
 const mockBot = {
-    onText: () => {},
-    on: () => {},
+    onText: () => { },
+    on: () => { },
     userCommands: {}
 };
 

@@ -23,7 +23,7 @@ module.exports = (bot, isAdmin) => {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const settings = getGroupSettings(msg.chat.id);
         const response = `${styles.header('Group Settings', '⚙️')}
 ${styles.listItem('📍', `Prefix: <code>${settings.prefix}</code>`)}
@@ -42,11 +42,11 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const lang = match[1].toLowerCase();
         const settings = getGroupSettings(msg.chat.id);
         settings.language = lang;
-        
+
         bot.sendMessage(msg.chat.id, styles.successMsg(`Language set to <b>${lang}</b>`), { parse_mode: 'HTML' });
     });
 
@@ -56,11 +56,11 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const settings = getGroupSettings(msg.chat.id);
         settings.antiSpam = match[1] === 'on';
         const status = settings.antiSpam ? '✅ Enabled' : '❌ Disabled';
-        
+
         bot.sendMessage(msg.chat.id, styles.successMsg(`Anti-Spam ${status}`), { parse_mode: 'HTML' });
     });
 
@@ -70,11 +70,11 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const settings = getGroupSettings(msg.chat.id);
         settings.welcomeMsg = !settings.welcomeMsg;
         const status = settings.welcomeMsg ? '✅ Enabled' : '❌ Disabled';
-        
+
         bot.sendMessage(msg.chat.id, styles.successMsg(`Welcome Messages ${status}`), { parse_mode: 'HTML' });
     });
 
@@ -84,7 +84,7 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
         }
-        
+
         const rules = match[1];
         bot.setChatDescription(msg.chat.id, rules)
             .then(() => bot.sendMessage(msg.chat.id, styles.successMsg('Group rules updated!'), { parse_mode: 'HTML' }))
@@ -100,7 +100,7 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
 ${description}
 
 ${styles.divider}`;
-            
+
             bot.sendMessage(msg.chat.id, response, { parse_mode: 'HTML' });
         } catch (err) {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Failed to get rules'), { parse_mode: 'HTML' });

@@ -9,7 +9,7 @@ module.exports = (bot) => {
             const chatId = msg.chat.id;
             const chatType = msg.chat.type;
             const chatDesc = msg.chat.description || 'No description';
-            
+
             const info = `${styles.header('Group Information', '👥')}
 ${styles.listItem('📌', `Name: <b>${chatTitle}</b>`)}
 ${styles.listItem('🆔', `ID: <code>${chatId}</code>`)}
@@ -40,7 +40,7 @@ ${styles.divider}`;
             const userMember = await bot.getChatMember(msg.chat.id, msg.from.id);
             const status = userMember.status;
             const joinDate = msg.date ? new Date(msg.date * 1000).toLocaleDateString() : 'Unknown';
-            
+
             const response = `${styles.header('Your Profile', '👤')}
 ${styles.listItem('👤', `Name: <b>${msg.from.first_name}${msg.from.last_name ? ' ' + msg.from.last_name : ''}</b>`)}
 ${styles.listItem('🆔', `ID: <code>${msg.from.id}</code>`)}

@@ -28,16 +28,16 @@ module.exports = (bot) => {
     bot.onText(/\/roll(?:\s+(\d+)d(\d+))?/, (msg, match) => {
         const dice = match ? (match[1] || 1) : 1;
         const sides = match ? (match[2] || 6) : 6;
-        
+
         let total = 0;
         let rolls = [];
-        
+
         for (let i = 0; i < dice; i++) {
             const roll = Math.floor(Math.random() * sides) + 1;
             rolls.push(roll);
             total += roll;
         }
-        
+
         const response = `🎲 <b>Rolling ${dice}d${sides}:</b>\n\n${rolls.map((r, i) => `Roll ${i + 1}: <b>${r}</b>`).join('\n')}\n\n<b>Total: ${total}</b>`;
         bot.sendMessage(msg.chat.id, response, { parse_mode: 'HTML' });
     });
