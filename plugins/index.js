@@ -8,16 +8,17 @@ const autoPostingCommands = require('./autoPostingCommands');
 const adminManagement = require('./adminManagement');
 const welcomeCommands = require('./welcomeCommands');
 
-module.exports = (bot, isAdmin, channelId, adminIds, groups) => {
+module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
 
     // Create context object to pass data to commands
-    const context = { groups, channelId, adminCount: adminIds.length };
+    const context = { groups, channelId, adminCount: adminIds.length, botStartTime };
 
     // Attach context to bot for use in commands
     bot.userCommands = context;
 
     // Load each plugin
+
     userCommands(bot);
     console.log('✅ User commands loaded');
 
@@ -27,7 +28,7 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups) => {
     channelCommands(bot, isAdmin, channelId);
     console.log('✅ Channel commands loaded');
 
-    welcomeCommands(bot, groups);
+    welcomeCommands(bot, groups, botStartTime);
     console.log('✅ Welcome commands loaded');
 
     const autoPosting = autoPostingCommands(bot, isAdmin, channelId);

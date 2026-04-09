@@ -4,7 +4,7 @@ const styles = require('../utils/styles');
 // Settings to control welcome/goodbye messages per chat
 const settings = {};
 
-module.exports = (bot, groups) => {
+module.exports = (bot, groups, botStartTime) => {
     // Helper function to get settings for a chat
     const getSettings = (chatId) => {
         if (!settings[chatId]) {
@@ -76,75 +76,94 @@ ${styles.dividerLong}
     });
 
     bot.onText(/\/menu/, async (msg) => {
-        const menuText = `${styles.box('T20 CONTROL MENU', 'Quick access to the most useful bot commands')}
-
-${styles.section('👤', 'General', [
-            styles.listItem('⚡', '/start — Welcome screen'),
-            styles.listItem('🗂', '/menu — Open this command menu'),
-            styles.listItem('❓', '/help — Bot help'),
-            styles.listItem('🏓', '/ping — Check latency'),
-        ])}
-
-${styles.section('🛠', 'Utilities', [
-            styles.listItem('🆔', '/id — Your user & chat info'),
-            styles.listItem('📢', '/post — Send channel post'),
-            styles.listItem('⏰', '/autopost — Auto-post controls'),
-        ])}
-
-${styles.section('👥', 'Group Tools', [
-            styles.listItem('🎉', '/welcome status — Welcome status'),
-            styles.listItem('🌙', '/goodbye status — Goodbye status'),
-            styles.listItem('✅', '/testwelcome — Test welcome'),
-            styles.listItem('🚪', '/testgoodbye — Test goodbye'),
-        ])}
-
-${styles.divider}
-<i>Tap a button below or type the command directly.</i>`;
-
-        const keyboard = [
-            [
-                { text: 'Start', callback_data: '/start' },
-                { text: 'Menu', callback_data: '/menu' }
-            ],
-            [
-                { text: 'Help', callback_data: '/help' },
-                { text: 'Ping', callback_data: '/ping' }
-            ],
-            [
-                { text: 'My ID', callback_data: '/id' },
-                { text: 'Post', callback_data: '/post' }
-            ],
-            [
-                { text: 'Autopost', callback_data: '/autopost' },
-                { text: 'Admins', callback_data: '/admin list' }
-            ],
-            [
-                { text: 'Welcome status', callback_data: '/welcome status' },
-                { text: 'Goodbye status', callback_data: '/goodbye status' }
-            ],
-            [
-                { text: 'Test welcome', callback_data: '/testwelcome' },
-                { text: 'Test goodbye', callback_data: '/testgoodbye' }
-            ]
-        ];
-
-        // Try to send photo with menu image, fallback to text if it fails
         try {
-            await bot.sendPhoto(msg.chat.id, 'https://files.catbox.moe/eycaql.png', {
-                caption: menuText,
-                parse_mode: 'HTML',
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
-            });
+            // Get bot info
+            const me = await bot.getMe();
+            
+            // Calculate uptime
+            const uptime = Date.now() - botStartTime;
+            const uptimeStr = styles.formatUptime(uptime);
+            
+            // Get current time and date
+            const timeStr = styles.formatTime();
+            const dateStr = styles.formatDate();
+            
+            // Build the styled menu
+            const botName = `${me.first_name || 'T20'} ${me.last_name || ''}`.trim().toUpperCase();
+            
+            const menuText = `${styles.menuHeader(botName)}
+
+${styles.menuInfo('Mᴏᴅᴇ', 'public')}
+${styles.menuInfo('Pʀᴇғɪx', '/')}
+${styles.menuInfo('Usᴇʀ', `@${me.id}`)}
+${styles.menuInfo('Cᴏᴍᴍᴀɴᴅs', '500')}
+${styles.menuInfo('Uᴘᴛɪᴍᴇ', uptimeStr)}
+${styles.menuInfo('Tɪᴍᴇ', timeStr)}
+${styles.menuInfo('Dᴀᴛᴇ', dateStr)}
+${styles.menuInfo('Pʟᴀᴛғᴏʀᴍ', 'Linux')}
+${styles.menuInfo('Rᴀᴍ', '93%')}
+${styles.menuClosing()}
+
+🎮 GROUP MANAGING BOT
+${styles.menuDivider()}
+
+📋 <b>Main Categories:</b>
+${styles.menuItem('💰', 'Economy System')}
+${styles.menuItem('🃏', 'Card Collection')}
+${styles.menuItem('⚔️', 'PVP Combat')}
+
+Type <code>/menu &lt;category&gt;</code> to view commands
+
+${styles.menuFooter('ʜᴏʀʟᴀ-ᴘᴏᴏᴋɪᴇ')}`;
+
+            const keyboard = [
+                [
+                    { text: 'Start', callback_data: '/start' },
+                    { text: 'Menu', callback_data: '/menu' }
+                ],
+                [
+                    { text: 'Help', callback_data: '/help' },
+                    { text: 'Ping', callback_data: '/ping' }
+                ],
+                [
+                    { text: 'My ID', callback_data: '/id' },
+                    { text: 'Post', callback_data: '/post' }
+                ],
+                [
+                    { text: 'Autopost', callback_data: '/autopost' },
+                    { text: 'Admins', callback_data: '/admin list' }
+                ],
+                [
+                    { text: 'Welcome status', callback_data: '/welcome status' },
+                    { text: 'Goodbye status', callback_data: '/goodbye status' }
+                ],
+                [
+                    { text: 'Test welcome', callback_data: '/testwelcome' },
+                    { text: 'Test goodbye', callback_data: '/testgoodbye' }
+                ]
+            ];
+
+            // Try to send photo with menu image, fallback to text if it fails
+            try {
+                await bot.sendPhoto(msg.chat.id, 'https://files.catbox.moe/eycaql.png', {
+                    caption: menuText,
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: keyboard
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to send menu photo, using text fallback:', error.message);
+                await bot.sendMessage(msg.chat.id, menuText, {
+                    parse_mode: 'HTML',
+                    reply_markup: {
+                        inline_keyboard: keyboard
+                    }
+                });
+            }
         } catch (error) {
-            console.error('Failed to send menu photo, using text fallback:', error.message);
-            await bot.sendMessage(msg.chat.id, menuText, {
-                parse_mode: 'HTML',
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
-            });
+            console.error('Error generating menu:', error);
+            await bot.sendMessage(msg.chat.id, '❌ Failed to generate menu', { parse_mode: 'HTML' });
         }
     });
 

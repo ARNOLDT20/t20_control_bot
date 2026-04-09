@@ -38,8 +38,9 @@ const isAdmin = (userId) => {
     return ADMIN_IDS.length === 0 || ADMIN_IDS.includes(userId);
 };
 
-// Store groups
+// Store groups and bot startup time
 let groups = [];
+const botStartTime = Date.now(); // Track when bot starts
 
 // Save groups when messages are received
 const handleGroupMessages = (bot) => {
@@ -153,7 +154,7 @@ ${styles.dividerLong}
         handleGroupMessages(bot);
 
         // Load plugins
-        const plugins = pluginLoader(bot, isAdmin, CHANNEL_ID, ADMIN_IDS, groups);
+        const plugins = pluginLoader(bot, isAdmin, CHANNEL_ID, ADMIN_IDS, groups, botStartTime);
 
         // Blog fetcher
         console.log('📚 Initializing blog fetcher from T20 Tech sources...');
