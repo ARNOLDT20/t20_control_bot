@@ -105,38 +105,48 @@ bot.onText(/\/menu/, async (msg) => {
         const uptime = Date.now() - botStartTime;
 
         const menuText = `
-⚠️ <b>BOT INFO</b> • <i>Prefix: /</i> • <b>T20 WOLF CONTROL</b>
+👑━━━━━━━━━━━━━━━━━━━👑
+║  ✨ T20-WOLF 🌚💥 ✨
+║  Royal Control Center
+👑━━━━━━━━━━━━━━━━━━━👑
 
-🐺🔥 <b>T20 WOLF CONTROL</b> 🔥🐺
-🌟 <i>Ultimate Telegram Bot System</i> 🌟
+  💎 Mᴏᴅᴇ : public
+  💎 Pʀᴇғɪx : /
+  💎 Usᴇʀ : @${me.username || 'Unknown'}
+  💎 Cᴏᴍᴍᴀɴᴅs : 50+
+  💎 Uᴘᴛɪᴍᴇ : ${styles.formatUptime(uptime)}
+  💎 Tɪᴍᴇ : ${new Date().toLocaleTimeString()}
+  💎 Dᴀᴛᴇ : ${new Date().toLocaleDateString()}
+  💎 Pʟᴀᴛғᴏʀᴍ : ${process.platform}
+  💎 Rᴀᴍ : ${Math.round((process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100)}%
+👑━━━━━━━━━━━━━━━━━━━━👑
 
-⚡️ <b>Status:</b> <code>🟢 Online</code>  
-⏱️ <b>Uptime:</b> <code>${styles.formatUptime(uptime)}</code>  
+👑 ROYAL COMMAND CENTER
+━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 User
+  🆔 ID • Info • Stats • Ping
 
-👤 <b>USER COMMANDS</b>  
-   🆔 /id - Get your info  
-   📊 /stats - Bot statistics  
-   🏓 /ping - Check latency  
+🎮 Fun
+  🎲 8Ball • Dice • Coin • Joke
 
-🔧 <b>ADMIN COMMANDS</b>  
-   👢 /kick - Remove user  
-   🚫 /ban - Ban user  
-   🔇 /mute - Mute user  
+🔧 Admin
+  🚫 Kick • Ban • Mute • Delete
 
-📢 <b>CHANNEL COMMANDS</b>  
-   📝 /post - Send to channel  
-   📣 /broadcast - Mass message  
+⚠️ Mod
+  📊 Warn • Timeout • Softban
 
-⚙️ <b>SYSTEM COMMANDS</b>  
-   🔧 /settings - Bot settings  
-   👋 /welcome on/off - Toggle welcome  
-   👋 /goodbye on/off - Toggle goodbye  
+⚙️ Settings
+  🎛️ Config • Rules • AntiSpam
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 <b>Type /start for full commands</b>
-🚀 <b>Ready to dominate the pack! 🐺⚡🔥</b>
+🤖 Chatbot
+  💬 AI Chat • Smart Responses
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type /start for all commands
+
+
+  👑 ᴍᴀsᴛᴇʀ : ARNOLD T20 👑
 `;
 
         const keyboard = {
