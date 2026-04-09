@@ -1,21 +1,6 @@
 // Settings & Configuration Commands
 const styles = require('../utils/styles');
-
-// Store group settings
-const groupSettings = {};
-
-const getGroupSettings = (chatId) => {
-    if (!groupSettings[chatId]) {
-        groupSettings[chatId] = {
-            prefix: '/',
-            language: 'en',
-            antiSpam: false,
-            welcomeMsg: true,
-            chatbot: true
-        };
-    }
-    return groupSettings[chatId];
-};
+const { getGroupSettings, setGroupSetting } = require('../utils/sharedSettings');
 
 module.exports = (bot, isAdmin) => {
     // === SETTINGS MENU ===
@@ -46,8 +31,7 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
         }
 
         const lang = match[1].toLowerCase();
-        const settings = getGroupSettings(msg.chat.id);
-        settings.language = lang;
+        setGroupSetting(msg.chat.id, 'language', lang);
 
         bot.sendMessage(msg.chat.id, styles.successMsg(`Language set to <b>${lang}</b>`), { parse_mode: 'HTML' });
     });
@@ -60,7 +44,7 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
         }
 
         const settings = getGroupSettings(msg.chat.id);
-        settings.antiSpam = match[1] === 'on';
+        setGroupSetting(msg.chat.id, 'antiSpam', match[1] === 'on');
         const status = settings.antiSpam ? '✅ Enabled' : '❌ Disabled';
 
         bot.sendMessage(msg.chat.id, styles.successMsg(`Anti-Spam ${status}`), { parse_mode: 'HTML' });
@@ -74,8 +58,9 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
         }
 
         const settings = getGroupSettings(msg.chat.id);
-        settings.welcomeMsg = !settings.welcomeMsg;
-        const status = settings.welcomeMsg ? '✅ Enabled' : '❌ Disabled';
+        const newValue = !settings.welcomeMsg;
+        setGroupSetting(msg.chat.id, 'welcomeMsg', newValue);
+        const status = newValue ? '✅ Enabled' : '❌ Disabled';
 
         bot.sendMessage(msg.chat.id, styles.successMsg(`Welcome Messages ${status}`), { parse_mode: 'HTML' });
     });
@@ -88,8 +73,9 @@ Use <code>/set &lt;setting&gt; &lt;value&gt;</code> to change settings.`;
         }
 
         const settings = getGroupSettings(msg.chat.id);
-        settings.chatbot = !settings.chatbot;
-        const status = settings.chatbot ? '✅ Enabled' : '❌ Disabled';
+        const newValue = !settings.chatbot;
+        setGroupSetting(msg.chat.id, 'chatbot', newValue);
+        const status = newValue ? '✅ Enabled' : '❌ Disabled';
 
         bot.sendMessage(msg.chat.id, styles.successMsg(`Chatbot ${status}`), { parse_mode: 'HTML' });
     });

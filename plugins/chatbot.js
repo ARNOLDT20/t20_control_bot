@@ -3,6 +3,7 @@
 
 const axios = require('axios');
 const styles = require('../utils/styles');
+const { getGroupSettings } = require('../utils/sharedSettings');
 
 // Function to get AI response from external API
 async function getAIResponse(message) {
@@ -140,7 +141,11 @@ module.exports = (bot) => {
     console.log('🤖 Chatbot loaded');
 
     // Handle chatbot conversations
-    bot.onText(/\/chat (.+)/, async (msg, match) => {
+    bot.onText(/\/chat (.+)/, async (msg, match) => {        const settings = getGroupSettings(msg.chat.id);
+        if (!settings.chatbot) {
+            bot.sendMessage(msg.chat.id, styles.errorMsg('Chatbot is currently disabled in this chat.'), { parse_mode: 'HTML' });
+            return;
+        }
         const query = match[1];
         const response = await getAIResponse(query);
 
