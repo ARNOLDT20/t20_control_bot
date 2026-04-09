@@ -152,8 +152,6 @@ module.exports = (bot) => {
         const reply = `${styles.header('🤖 T20 WOLF AI Chatbot', '💬')}
 <i>Your AI Assistant</i>
 
-<b>You:</b> ${query}
-
 <b>T20 WOLF AI:</b> ${response}
 
 ${styles.dividerShort}
@@ -170,8 +168,6 @@ ${styles.dividerShort}
 
             const reply = `${styles.header('🤖 T20 WOLF AI Chatbot', '💬')}
 <i>AI Conversation</i>
-
-<b>You:</b> ${msg.text}
 
 <b>T20 AI:</b> ${response}
 

@@ -19,7 +19,10 @@ t20_control_bot/
 │   ├── chatbot.js           # AI chatbot functionality
 │   └── [other plugins...]
 ├── utils/                    # Utility modules
-│   └── styles.js            # Beautiful text formatting
+│   ├── styles.js            # Beautiful text formatting
+│   ├── sharedSettings.js    # Centralized group settings
+│   ├── blogFetcher.js       # Blog content fetcher
+│   └── templateFormatter.js # Message template formatting
 └── bot_old.js               # Backup of previous version
 ```
 
@@ -55,6 +58,7 @@ t20_control_bot/
 - **T20 WOLF AI** - Powered by advanced T20 WOLF AI system
 - **Real AI Responses** - Live AI conversations with intelligent replies
 - **Supabase Integration** - Connected to T20 WOLF AI via Supabase functions
+- **Admin Control** - `/togglechatbot` to enable/disable per group
 
 ### Auto-Posting System
 - **5-Hour Interval** - Content posted every 5 hours automatically
@@ -83,6 +87,15 @@ Posts include:
 
 ### System Management
 - `/admin list` - Show configured admins
+
+### Group Settings (Admin Only)
+- `/settings` - View current group settings
+- `/setlang [language]` - Set group language
+- `/antispam on/off` - Toggle anti-spam protection
+- `/togglewelcome` - Toggle welcome messages
+- `/togglechatbot` - Toggle AI chatbot functionality
+- `/setrules [rules]` - Set group rules
+- `/rules` - View group rules
 
 ## 🎨 Beautiful Styling
 
