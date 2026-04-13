@@ -1,93 +1,129 @@
-// Auto-Posting Plugin with Beautiful Templates and Blog Fetching
+// Auto-Posting Plugin — Movie Edition
+// Posts trending movies from BlazeMovieHub every 5 hours
+
 const styles = require('../utils/styles');
-const { createTechTipPost, createQuestionPost, createBlogPost, createMixedPost } = require('../utils/templateFormatter');
-const blogFetcher = require('../utils/blogFetcher');
+const movieApi = require('../utils/movieApi');
 
-const techTips = [
-    "💡 <b>Did you know?</b>\nUse <code>const</code> and <code>let</code> in JavaScript instead of <code>var</code> for better scoping and performance.",
-    "⚡ <b>Quick Tip:</b>\nAlways validate user input on the server-side, even if you validate on the client-side!",
-    "🔒 <b>Security Tip:</b>\nNever commit passwords or API keys to version control. Use environment variables instead.",
-    "📊 <b>Performance Hack:</b>\nUse <code>debounce</code> for search inputs to reduce API calls by up to 90%.",
-    "🎯 <b>Code Quality:</b>\nWrite descriptive variable names. <code>const userData</code> is better than <code>const d</code>.",
-    "🚀 <b>DevOps Tip:</b>\nUse containerization (Docker) to ensure your app runs the same everywhere.",
-    "🔄 <b>Git Best Practice:</b>\nCommit early, commit often. Small, focused commits are easier to review and debug.",
-    "💻 <b>Frontend Hack:</b>\nUse CSS Grid for layouts instead of flexbox when you need 2D alignment.",
-    "🌐 <b>Web Tip:</b>\nMinify and compress your assets. Every KB counts for mobile users.",
-    "🧪 <b>Testing Tip:</b>\nWrite unit tests for critical functions. It catches bugs 10x faster than manual testing!",
-];
+const SITE_URL = 'https://blazemoviehub.t20tech.site';
 
-const techQuestions = [
-    "❓ <b>Question of the Hour:</b>\nWhat's the difference between <code>==</code> and <code>===</code> in JavaScript?",
-    "🤔 <b>Tech Question:</b>\nHow many HTTP status codes do you know? (Hint: There are 60+!)",
-    "💭 <b>Discussion:</b>\nSQL or NoSQL? When should you use each?",
-    "🧠 <b>Challenge:</b>\nCan you explain REST API principles in one sentence?",
-    "🎓 <b>Learning Q:</b>\nWhat's the difference between synchronous and asynchronous programming?",
-];
+// Shuffle array
+const shuffle = (arr) => arr.slice().sort(() => Math.random() - 0.5);
 
-const motivationalMessages = [
-    "🚀 Keep coding, keep growing!",
-    "💪 Every bug fixed is a lesson learned!",
-    "✨ Your code is getting better every day.",
-    "🌟 Great developers never stop learning!",
-    "💻 Code today, create tomorrow!",
-];
+// Last posted movie index tracker
+let lastPostedIndex = 0;
+let cachedMovies = [];
 
-const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+// Refresh movie cache from API
+const refreshMovies = async () => {
+    try {
+        const items = await movieApi.getTrending();
+        if (items && items.length) {
+            cachedMovies = shuffle(items);
+            console.log(`🎬 Movie cache refreshed: ${cachedMovies.length} movies`);
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not refresh movie cache:', err.message);
+    }
+};
+
+// Format a movie post for the channel
+const formatMoviePost = (movie) => {
+    const title = (movie.title || 'Unknown').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const year = movie.releaseDate ? movie.releaseDate.slice(0, 4) : 'TBA';
+    const genre = movie.genre ? movie.genre.split(',').slice(0, 3).join(' · ') : 'General';
+    const country = movie.countryName || '';
+    const rating = parseFloat(movie.imdbRatingValue) || 0;
+    const ratingStr = rating > 0 ? `⭐ ${rating}/10` : '⭐ Not rated yet';
+    const type = movieApi.subjectTypeLabel(movie.subjectType || 1);
+    const detailPath = movie.detailPath || '';
+    const watchUrl = `${SITE_URL}/movie/${detailPath}`;
+
+    return `🎬 <b>${title}</b> (${year})
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${type}${country ? ` · 🌍 ${country}` : ''}
+🎭 <b>Genre:</b> ${genre}
+${ratingStr}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📺 Stream or Download in HD Quality
+📀 Available: 4K · 1080p · 720p · 480p
+
+🔗 <a href="${watchUrl}">Watch / Download Now</a>
+🌐 <a href="${SITE_URL}">BlazeMovieHub</a>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 Use /moviesearch or /download in bot
+👑 <i>T20 Wolf Bot by Arnold T20</i>`;
+};
 
 module.exports = (bot, isAdmin, channelId) => {
     let autoPostingEnabled = true;
     let autoPostingInterval = null;
     const AUTO_POST_INTERVAL_MS = 5 * 60 * 60 * 1000; // 5 hours
 
-    // Post auto-content with beautiful templates
+    // Post a trending movie to the channel
     const postAutoContent = async () => {
         try {
-            const contentTypes = ['blog', 'tip', 'question', 'mixed'];
-            const type = getRandomItem(contentTypes);
-
-            let message = '';
-
-            if (type === 'blog' && blogFetcher.getBlogs().length > 0) {
-                // Post a blog from T20 Tech
-                const blog = blogFetcher.getRandomBlog();
-                message = createBlogPost(blog.title, blog.excerpt, blog.link);
-            } else if (type === 'tip') {
-                // Post a tech tip with watermark
-                message = createTechTipPost(getRandomItem(techTips));
-            } else if (type === 'question') {
-                // Post a question with motivation
-                message = createQuestionPost(
-                    getRandomItem(techQuestions),
-                    getRandomItem(motivationalMessages)
-                );
-            } else {
-                // Post mixed content
-                message = createMixedPost(
-                    getRandomItem(techTips) + '\n\n' + getRandomItem(motivationalMessages),
-                    'mixed'
-                );
+            // Refresh cache if empty or depleted
+            if (cachedMovies.length === 0 || lastPostedIndex >= cachedMovies.length) {
+                await refreshMovies();
+                lastPostedIndex = 0;
             }
 
-            bot.sendMessage(channelId, message, { parse_mode: 'HTML' })
-                .then(() => {
-                    console.log(`✅ [${new Date().toLocaleString()}] Auto-post (${type}) sent successfully`);
-                })
-                .catch(err => {
-                    console.error(`❌ [${new Date().toLocaleString()}] Auto-post failed:`, err.message);
-                });
-        } catch (error) {
-            console.error(`❌ [${new Date().toLocaleString()}] Auto-post error:`, error.message);
+            if (cachedMovies.length === 0) {
+                console.warn('⚠️ No movies in cache to post');
+                return;
+            }
+
+            const movie = cachedMovies[lastPostedIndex % cachedMovies.length];
+            lastPostedIndex++;
+
+            const message = formatMoviePost(movie);
+            const posterUrl = movie.cover?.url || movie.thumbnail;
+
+            // Try to send with movie poster image
+            if (posterUrl) {
+                try {
+                    await bot.sendPhoto(channelId, posterUrl, {
+                        caption: message,
+                        parse_mode: 'HTML',
+                        reply_markup: {
+                            inline_keyboard: [[
+                                { text: '▶️ Watch / Download', url: `${SITE_URL}/movie/${movie.detailPath || ''}` },
+                                { text: '🔥 More Movies', url: SITE_URL }
+                            ]]
+                        }
+                    });
+                    console.log(`✅ [${new Date().toLocaleString()}] Movie post sent: ${movie.title}`);
+                    return;
+                } catch (photoErr) {
+                    console.warn(`⚠️ Photo post failed, sending text: ${photoErr.message}`);
+                }
+            }
+
+            // Fallback: text only
+            await bot.sendMessage(channelId, message, {
+                parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: '▶️ Watch / Download', url: `${SITE_URL}/movie/${movie.detailPath || ''}` },
+                        { text: '🔥 More Movies', url: SITE_URL }
+                    ]]
+                }
+            });
+            console.log(`✅ [${new Date().toLocaleString()}] Movie post (text) sent: ${movie.title}`);
+
+        } catch (err) {
+            console.error(`❌ Auto-post error: ${err.message}`);
         }
     };
 
     // Start auto-posting
     const startAutoPosting = () => {
         if (autoPostingInterval) return;
-
-        console.log(`📅 Auto-posting enabled! Next post in 1 hour...`);
         autoPostingEnabled = true;
+        console.log(`🎬 Movie auto-posting enabled — posts every 5 hours to ${channelId}`);
 
-        postAutoContent();
+        // Load movies first then post immediately
+        refreshMovies().then(() => postAutoContent());
 
         autoPostingInterval = setInterval(postAutoContent, AUTO_POST_INTERVAL_MS);
     };
@@ -99,14 +135,14 @@ module.exports = (bot, isAdmin, channelId) => {
             autoPostingInterval = null;
         }
         autoPostingEnabled = false;
-        console.log(`⏸️ Auto-posting disabled`);
+        console.log('⏸️ Movie auto-posting disabled');
     };
 
-    // Start auto-posting on startup
-    setTimeout(startAutoPosting, 2000);
+    // Start on boot
+    setTimeout(startAutoPosting, 3000);
 
-    // === AUTO-POSTING CONTROL ===
-    bot.onText(/\/autopost\s+(on|off|now|status)/, (msg, match) => {
+    // ═══ /autopost commands ═══════════════════════════════════════════════════
+    bot.onText(/\/autopost\s+(on|off|now|status)/, async (msg, match) => {
         if (!isAdmin(msg.from.id)) {
             bot.sendMessage(msg.chat.id, styles.errorMsg('Admin command only.'), { parse_mode: 'HTML' });
             return;
@@ -116,28 +152,38 @@ module.exports = (bot, isAdmin, channelId) => {
 
         if (action === 'on') {
             if (autoPostingEnabled) {
-                bot.sendMessage(msg.chat.id, styles.infoMsg('Auto-posting is already running!'), { parse_mode: 'HTML' });
-                return;
+                return bot.sendMessage(msg.chat.id, styles.infoMsg('Movie auto-posting is already running!'), { parse_mode: 'HTML' });
             }
             startAutoPosting();
-            bot.sendMessage(msg.chat.id, styles.successMsg('Auto-posting enabled!\nThe bot will post tech tips and questions every 1 hour.'), { parse_mode: 'HTML' });
+            bot.sendMessage(msg.chat.id, styles.successMsg('🎬 Movie auto-posting enabled!\nBot will post trending movies every 5 hours to the channel.'), { parse_mode: 'HTML' });
 
         } else if (action === 'off') {
             if (!autoPostingEnabled) {
-                bot.sendMessage(msg.chat.id, styles.infoMsg('Auto-posting is already stopped!'), { parse_mode: 'HTML' });
-                return;
+                return bot.sendMessage(msg.chat.id, styles.infoMsg('Auto-posting is already stopped.'), { parse_mode: 'HTML' });
             }
             stopAutoPosting();
-            bot.sendMessage(msg.chat.id, styles.infoMsg('Auto-posting disabled.\nYou can turn it back on with /autopost on'), { parse_mode: 'HTML' });
+            bot.sendMessage(msg.chat.id, styles.infoMsg('🎬 Movie auto-posting disabled.\nUse /autopost on to restart.'), { parse_mode: 'HTML' });
 
         } else if (action === 'now') {
-            postAutoContent();
-            bot.sendMessage(msg.chat.id, styles.successMsg('Posted now to channel!'), { parse_mode: 'HTML' });
+            await postAutoContent();
+            bot.sendMessage(msg.chat.id, styles.successMsg('🎬 Posted a trending movie to the channel now!'), { parse_mode: 'HTML' });
 
         } else if (action === 'status') {
-            const status = autoPostingEnabled ? styles.status.running : styles.status.stopped;
-            const nextPost = autoPostingEnabled ? 'Every 1 hour' : 'N/A';
-            bot.sendMessage(msg.chat.id, `${styles.header('Auto-Posting Status', '📊')}\n${styles.listItem(status, '')}\nNext Post: <b>${nextPost}</b>\nChannel: <b>${channelId}</b>`, { parse_mode: 'HTML' });
+            const status = autoPostingEnabled ? '🟢 Running' : '🔴 Stopped';
+            const nextPost = autoPostingEnabled ? 'Every 5 hours' : 'N/A';
+            const cacheSize = cachedMovies.length;
+
+            bot.sendMessage(msg.chat.id,
+                `${styles.header('Auto-Posting Status', '📊')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${styles.listItem('📡', `Status: <b>${status}</b>`)}
+${styles.listItem('⏰', `Interval: <b>${nextPost}</b>`)}
+${styles.listItem('📢', `Channel: <b>${channelId}</b>`)}
+${styles.listItem('🎬', `Movie Cache: <b>${cacheSize}</b> movies`)}
+${styles.listItem('📍', `Next post #: <b>${lastPostedIndex + 1}</b>`)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Content: 🎬 Trending movies from BlazeMovieHub`,
+                { parse_mode: 'HTML' });
         }
     });
 
