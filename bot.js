@@ -219,9 +219,36 @@ const handleGroupMessages = (bot) => {
     });
 };
 
+// ─── Webhook or Polling ───────────────────────────────────────────────────────
+// Use webhook mode when REPLIT_DEV_DOMAIN is available (avoids 409 conflicts)
+// Fall back to polling if no public domain is set
+const REPLIT_DOMAIN = process.env.REPLIT_DEV_DOMAIN;
+const USE_WEBHOOK = !!REPLIT_DOMAIN;
+const WEBHOOK_PATH = `/tg-webhook-${TOKEN.split(':')[0]}`;
+const WEBHOOK_URL = USE_WEBHOOK ? `https://${REPLIT_DOMAIN}${WEBHOOK_PATH}` : null;
+
 const bot = new TelegramBot(TOKEN, {
     polling: false,
     request: PROXY_AGENT ? { agent: PROXY_AGENT } : undefined
+});
+
+// Webhook endpoint — Telegram POSTs updates here
+if (USE_WEBHOOK) {
+    app.use(express.json());
+    app.post(WEBHOOK_PATH, (req, res) => {
+        try {
+            bot.processUpdate(req.body);
+        } catch (e) {
+            console.error('processUpdate error:', e.message);
+        }
+        res.sendStatus(200);
+    });
+}
+
+bot.on('error', (err) => {
+    if (err.message && !err.message.includes('EFATAL')) {
+        console.error('Bot error:', err.message);
+    }
 });
 
 bot.getMe()
@@ -234,66 +261,77 @@ bot.getMe()
         console.log(`Bot ID    : ${me.id}`);
         console.log(`Status    : 🟢 Connected`);
         console.log(`Channel   : ${CHANNEL_ID}`);
+        console.log(`Mode      : ${USE_WEBHOOK ? '🔗 Webhook' : '📡 Polling'}`);
         console.log(`Admin Mode: ${ADMIN_IDS.length > 0 ? '✅ Enabled (' + ADMIN_IDS.length + ' admins)' : '⚠️ Open (no restriction)'}`);
-        console.log(`Proxy     : ${PROXY_URL ? '✅ ' + PROXY_URL : '❌ Direct connection'}`);
         console.log('═'.repeat(50));
         console.log('');
 
-        // Clear any existing webhook or competing polling session
-        try {
-            await bot._request('deleteWebhook', { drop_pending_updates: true });
-            console.log('✅ Webhook cleared — polling mode active');
-        } catch (err) {
-            console.warn('⚠️ Could not clear webhook (non-critical):', err.message);
-        }
-
-        // Small delay to let Telegram close any previous session
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        bot.startPolling({ restart: false });
-
-        bot.on('error', (err) => {
-            console.error('Bot error:', err.message || err);
-        });
-
-        bot.on('polling_error', (err) => {
-            console.error('Polling error:', err.message || err);
-            if (err && err.response && err.response.body) {
-                console.error('Telegram response:', JSON.stringify(err.response.body, null, 2));
-            }
-        });
-
+        // Register all plugin handlers
         handleGroupMessages(bot);
-
         pluginLoader(bot, isAdmin, CHANNEL_ID, ADMIN_IDS, groups, botStartTime);
 
-        console.log('📚 Initializing blog fetcher from T20 Tech sources...');
+        if (USE_WEBHOOK) {
+            // ── Webhook mode ────────────────────────────────────────────────
+            try {
+                const wh = await bot.getWebHookInfo();
+                if (wh.url === WEBHOOK_URL) {
+                    console.log(`✅ Webhook already set: ${WEBHOOK_URL}`);
+                } else {
+                    await bot.setWebHook(WEBHOOK_URL, { drop_pending_updates: true });
+                    console.log(`✅ Webhook registered: ${WEBHOOK_URL}`);
+                }
+            } catch (err) {
+                console.error('❌ Failed to set webhook:', err.message);
+                console.log('⚠️ Falling back to polling...');
+                await startPolling(bot);
+            }
+        } else {
+            // ── Polling fallback ─────────────────────────────────────────────
+            await startPolling(bot);
+        }
+
+        // Blog fetcher (background)
+        console.log('📚 Initializing blog fetcher...');
         blogFetcher.fetchAllBlogs(true)
             .then((blogs) => {
                 console.log(`✅ Blog fetcher ready — ${blogs.length} posts cached`);
                 setInterval(() => {
                     blogFetcher.fetchAllBlogs(true)
                         .then(b => console.log(`🔄 Blog cache refreshed: ${b.length} posts`))
-                        .catch(err => console.warn(`⚠️ Blog refresh failed: ${err.message}`));
+                        .catch(e => console.warn(`⚠️ Blog refresh: ${e.message}`));
                 }, 12 * 60 * 60 * 1000);
             })
             .catch((err) => {
                 console.warn(`⚠️ Blog fetcher failed: ${err.message}`);
-                console.log('📝 Continuing with built-in tech tips only.');
             });
     })
     .catch((err) => {
         console.error('❌ Failed to authenticate bot token:', err.message || err);
-        if (err.response && err.response.body) {
-            console.error('Telegram error:', err.response.body);
-        }
-        console.error('Check that your TELEGRAM_TOKEN is valid.');
         process.exit(1);
     });
 
+async function startPolling(bot) {
+    try {
+        await bot._request('deleteWebhook', { drop_pending_updates: true });
+        console.log('✅ Webhook cleared — starting polling...');
+    } catch (_) {}
+
+    bot.on('polling_error', (err) => {
+        const code = err?.response?.body?.error_code;
+        if (code !== 409) {
+            console.error('Polling error:', err.message || err);
+        }
+    });
+
+    bot.startPolling({ interval: 2000, timeout: 10, restart: false });
+    console.log('📡 Polling active');
+}
+
 // ─── Process handlers ─────────────────────────────────────────────────────────
 process.on('unhandledRejection', (reason) => {
-    console.error('Unhandled Rejection:', reason);
+    if (reason && reason.message && !reason.message.includes('EFATAL')) {
+        console.error('Unhandled Rejection:', reason.message || reason);
+    }
 });
 
 process.on('uncaughtException', (err) => {
@@ -301,15 +339,10 @@ process.on('uncaughtException', (err) => {
 });
 
 const gracefulShutdown = (signal) => {
-    console.log(`\n🔌 ${signal} received — shutting down gracefully...`);
-    try {
-        if (TOKEN && bot) bot.stopPolling();
-    } catch (_) {}
-    server.close(() => {
-        console.log('✅ Server closed.');
-        process.exit(0);
-    });
-    setTimeout(() => process.exit(0), 5000);
+    console.log(`\n🔌 ${signal} — shutting down...`);
+    try { bot.stopPolling(); } catch (_) {}
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 3000);
 };
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
