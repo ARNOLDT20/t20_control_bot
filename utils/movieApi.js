@@ -13,6 +13,10 @@ const headers = {
 
 const request = async (path) => {
     const res = await axios.get(`${BASE_URL}${path}`, { headers, timeout: 12000 });
+    // If response is HTML instead of JSON, API is down/changed
+    if (typeof res.data === 'string' && res.data.includes('<!doctype')) {
+        throw new Error('API returned HTML — endpoint unavailable');
+    }
     if (res.data && res.data.success) return res.data.results;
     throw new Error(res.data?.message || 'API error');
 };

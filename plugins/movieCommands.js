@@ -71,26 +71,31 @@ const buildResultsKeyboard = (items, query, page, hasMore) => {
     return { inline_keyboard: rows };
 };
 
-// Build quality selection keyboard
+// Build quality selection keyboard — tapping a quality triggers payment flow
+// callback_data: mv_quality_SUBJECTID_RESOLUTION_DETAILPATH
 const buildQualityKeyboard = (subjectId, detailPath, resolutions) => {
     const rows = [];
+    const dp = encodeURIComponent(detailPath); // safe for callback_data
 
     if (resolutions.length === 0) {
-        // No resolutions known — offer general download
-        rows.push([{ text: '🌐 Watch / Download', url: movieApi.getWatchUrl(detailPath) }]);
+        // No known resolutions — use 480p as default
+        rows.push([{
+            text: '📀 Download (SD)',
+            callback_data: `mv_quality_${subjectId}_480_${dp}`
+        }]);
     } else {
         for (let i = 0; i < resolutions.length; i += 2) {
             const row = [];
             const res = resolutions[i];
             row.push({
                 text: movieApi.resolutionLabel(res),
-                url: movieApi.getDownloadUrl(detailPath, res)
+                callback_data: `mv_quality_${subjectId}_${res}_${dp}`
             });
             if (resolutions[i + 1]) {
                 const res2 = resolutions[i + 1];
                 row.push({
                     text: movieApi.resolutionLabel(res2),
-                    url: movieApi.getDownloadUrl(detailPath, res2)
+                    callback_data: `mv_quality_${subjectId}_${res2}_${dp}`
                 });
             }
             rows.push(row);
@@ -98,11 +103,30 @@ const buildQualityKeyboard = (subjectId, detailPath, resolutions) => {
     }
 
     rows.push([
-        { text: '▶️ Watch Online', url: movieApi.getWatchUrl(detailPath) },
+        { text: '▶️ Watch Free Online', url: movieApi.getWatchUrl(detailPath) },
         { text: '🔙 Back', callback_data: `mv_back_${subjectId}` }
     ]);
     rows.push([{ text: '🔍 Search Another Movie', callback_data: 'mv_new_search' }]);
     return { inline_keyboard: rows };
+};
+
+// Build payment options keyboard shown after quality is chosen
+// subjectId, quality, detailPath encoded
+const buildPaymentKeyboard = (subjectId, quality, detailPath, starPrice) => {
+    const dp = encodeURIComponent(detailPath);
+    return {
+        inline_keyboard: [
+            [
+                { text: `⭐ Pay ${starPrice} Stars`, callback_data: `pay_stars_${subjectId}_${quality}_${dp}` },
+                { text: '🔑 Use OTP Code', callback_data: `otp_enter_${subjectId}_${quality}_${dp}` }
+            ],
+            [{ text: '▶️ Watch Free Online', url: movieApi.getWatchUrl(detailPath) }],
+            [
+                { text: '🔙 Back to Qualities', callback_data: `mv_pick_${subjectId}` },
+                { text: '🔍 New Search', callback_data: 'mv_new_search' }
+            ]
+        ]
+    };
 };
 
 // Build trending keyboard
@@ -133,7 +157,7 @@ const buildTrendingKeyboard = (items) => {
 const sendLoading = (bot, chatId, text = '⏳ Searching...') => bot.sendMessage(chatId, text, { parse_mode: 'HTML' });
 
 // ─── Main module ─────────────────────────────────────────────────────────────
-module.exports = (bot) => {
+module.exports = (bot, STARS_PRICE = 50) => {
 
     // ═══ /movies — main menu ═══════════════════════════════════════════════
     bot.onText(/\/movies$/, (msg) => {
@@ -313,31 +337,37 @@ Choose an option:`, {
 
     // ═══ /moviehelp ═══════════════════════════════════════════════════════════
     bot.onText(/\/moviehelp/, (msg) => {
-        bot.sendMessage(msg.chat.id, `📀 <b>How to Download Movies</b>
+        bot.sendMessage(msg.chat.id, `📀 <b>Movie Download Guide</b>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 <b>Step 1:</b> 🔍 Search for a movie
-   → <code>/download Avengers</code>
-   → <code>/moviesearch Spider-Man</code>
+   <code>/download Avengers</code>
+   <code>/moviesearch Spider-Man</code>
 
-<b>Step 2:</b> 🎬 Pick a movie from results
-   → Tap any result button
+<b>Step 2:</b> 🎬 Tap a movie from results
 
 <b>Step 3:</b> 📀 Choose your quality
-   → 4K | 1080p | 720p | 480p | 360p
+   → 4K · 1080p · 720p · 480p · 360p
 
-<b>Step 4:</b> ⬇️ Download from site
-   → Click the quality button to open BlazeMovieHub
-   → Tap the download button on the page
+<b>Step 4:</b> 💳 Choose access method:
+   ⭐ <b>Telegram Stars</b> — pay ${STARS_PRICE} Stars
+   🔑 <b>OTP Code</b> — get a code from admin
+   ▶️ <b>Watch Free Online</b> — stream without paying
+
+<b>Step 5:</b> ⬇️ Receive your movie!
+   → Video preview + premium download link sent here
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-<b>Available Commands:</b>
+<b>💳 Payment Options:</b>
+⭐ <b>Stars</b> — buy via Telegram's built-in Stars
+🔑 <b>OTP</b> — redeem code: <code>/redeem T20-XXXXXXXX</code>
+
+<b>📋 All Commands:</b>
 🔍 <code>/moviesearch &lt;title&gt;</code>
 ⬇️ <code>/download &lt;title&gt;</code>
+🔑 <code>/redeem &lt;code&gt;</code>
 📈 <code>/trending</code>
-🔥 <code>/latestmovies</code>
 🎬 <code>/movies</code>
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🌐 <a href="${movieApi.SITE_URL}">BlazeMovieHub</a> — Stream &amp; Download HD`, {
             parse_mode: 'HTML',
@@ -494,6 +524,46 @@ ${uploadBy}
                 await bot.editMessageText(caption, {
                     chat_id: chatId, message_id: msgId, parse_mode: 'HTML', reply_markup: keyboard
                 });
+            }
+
+            // ── Quality selected — show payment options ────────────────────
+            else if (data.startsWith('mv_quality_')) {
+                // Format: mv_quality_SUBJECTID_RESOLUTION_ENCODEDPATH
+                const rest = data.replace('mv_quality_', '');
+                const firstUnderscore = rest.indexOf('_');
+                const subjectId = rest.slice(0, firstUnderscore);
+                const afterId = rest.slice(firstUnderscore + 1);
+                const secondUnderscore = afterId.indexOf('_');
+                const quality = parseInt(afterId.slice(0, secondUnderscore)) || 480;
+                const detailPath = decodeURIComponent(afterId.slice(secondUnderscore + 1));
+                const qualityLabel = movieApi.resolutionLabel(quality);
+
+                // Get movie title from session or fetch
+                let title = getSession(userId).selectedTitle || 'this movie';
+
+                await bot.sendMessage(chatId,
+                    `🔒 <b>Premium Download</b>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎬 <b>${escape(title)}</b>
+📀 Quality: <b>${qualityLabel}</b>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+To receive this movie, choose one of:
+
+⭐ <b>Pay ${STARS_PRICE} Telegram Stars</b>
+   → Instant access, sent directly here
+
+🔑 <b>Use an OTP Code</b>
+   → Redeem a code from Arnold T20 (admin)
+   → Command: <code>/redeem T20-XXXXXXXX</code>
+
+▶️ <b>Watch Free Online</b>
+   → Stream on BlazeMovieHub (no download)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                    {
+                        parse_mode: 'HTML',
+                        reply_markup: buildPaymentKeyboard(subjectId, quality, detailPath, STARS_PRICE)
+                    }
+                );
             }
 
             // ── Back from quality → show results again ─────────────────────

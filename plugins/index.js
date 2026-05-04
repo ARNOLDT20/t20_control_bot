@@ -18,6 +18,7 @@ const help = require('./help');
 const settings = require('./settings');
 const start = require('./start');
 const movieCommands = require('./movieCommands');
+const paymentCommands = require('./paymentCommands');
 
 module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
@@ -72,7 +73,10 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     moderationCommands(bot, isAdmin);
     console.log('✅ Moderation commands loaded');
 
-    movieCommands(bot);
+    const payment = paymentCommands(bot, isAdmin);
+    console.log('✅ Payment commands loaded');
+
+    movieCommands(bot, payment.MOVIE_STARS_PRICE);
     console.log('✅ Movie commands loaded');
 
     const autoPosting = autoPostingCommands(bot, isAdmin, channelId);
