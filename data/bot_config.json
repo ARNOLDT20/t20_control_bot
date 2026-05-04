@@ -1,0 +1,17 @@
+{
+  "autopost": {
+    "mode": "tech",
+    "interval": 5,
+    "enabled": true,
+    "techIndex": 0,
+    "movieIndex": 0,
+    "pollIndex": 0,
+    "matterIndex": 0,
+    "lastPosted": 0,
+    "contentCycle": 0,
+    "setupDone": false,
+    "setupChannel": null
+  },
+  "setupMessageId": null,
+  "version": 2
+}

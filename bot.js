@@ -268,7 +268,7 @@ bot.getMe()
 
         // Register all plugin handlers
         handleGroupMessages(bot);
-        pluginLoader(bot, isAdmin, CHANNEL_ID, ADMIN_IDS, groups, botStartTime);
+        const { autoPosting } = pluginLoader(bot, isAdmin, CHANNEL_ID, ADMIN_IDS, groups, botStartTime);
 
         if (USE_WEBHOOK) {
             // ── Webhook mode ────────────────────────────────────────────────
@@ -288,6 +288,39 @@ bot.getMe()
         } else {
             // ── Polling fallback ─────────────────────────────────────────────
             await startPolling(bot);
+        }
+
+        // ── First-run setup wizard ─────────────────────────────────────────────
+        // Triggers when auto-posting has never been configured
+        const configStore = require('./utils/configStore');
+        if (!configStore.get('autopost.setupDone')) {
+            if (ADMIN_IDS.length > 0) {
+                // DM each admin the setup wizard after a short delay
+                setTimeout(async () => {
+                    console.log('🎛️ First run — sending auto-post setup wizard to admins...');
+                    for (const adminId of ADMIN_IDS) {
+                        try {
+                            await autoPosting.sendSetupWizard(bot, adminId);
+                        } catch (err) {
+                            console.warn(`⚠️ Could not DM admin ${adminId}: ${err.message}`);
+                            // Fallback: post wizard in channel
+                            try {
+                                await autoPosting.sendSetupWizard(bot, CHANNEL_ID);
+                            } catch (_) {}
+                        }
+                    }
+                }, 8000);
+            } else {
+                // No admins set — post setup wizard in channel
+                setTimeout(async () => {
+                    console.log('🎛️ First run — posting auto-post setup wizard in channel...');
+                    try {
+                        await autoPosting.sendSetupWizard(bot, CHANNEL_ID);
+                    } catch (err) {
+                        console.warn(`⚠️ Could not post setup wizard: ${err.message}`);
+                    }
+                }, 8000);
+            }
         }
 
         // Blog fetcher (background)
