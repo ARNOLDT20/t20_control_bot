@@ -19,6 +19,7 @@ const settings = require('./settings');
 const start = require('./start');
 const movieCommands = require('./movieCommands');
 const paymentCommands = require('./paymentCommands');
+const dmManagement = require('./dmManagement');
 
 module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
     console.log('📦 Loading plugins...');
@@ -81,6 +82,9 @@ module.exports = (bot, isAdmin, channelId, adminIds, groups, botStartTime) => {
 
     const autoPosting = autoPostingCommands(bot, isAdmin, channelId);
     console.log('✅ Auto-posting commands loaded');
+
+    dmManagement(bot);
+    console.log('✅ DM channel management loaded');
 
     chatbot(bot);
     console.log('✅ Chatbot loaded');

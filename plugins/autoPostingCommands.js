@@ -4,6 +4,7 @@
 
 const configStore = require('../utils/configStore');
 const techContent = require('../utils/techContent');
+const pollsContent = require('../utils/pollsContent');
 const movieApi = require('../utils/movieApi');
 
 const SITE_URL = 'https://blazemoviehub.t20tech.site';
@@ -51,8 +52,15 @@ const postTechTip = async (bot, channelId) => {
 // Post a tech poll (regular or quiz)
 const postTechPoll = async (bot, channelId) => {
     const idx = configStore.get('autopost.pollIndex') || 0;
-    const polls = techContent.techPolls;
-    const poll = polls[idx % polls.length];
+    // Merge all poll pools for maximum variety
+    const allPolls = [
+        ...pollsContent.techQuizPolls,
+        ...pollsContent.techOpinionPolls,
+        ...pollsContent.funCommunityPolls,
+        ...pollsContent.dailyQuestions,
+        ...techContent.techPolls,
+    ];
+    const poll = allPolls[idx % allPolls.length];
     configStore.set('autopost.pollIndex', idx + 1);
 
     const opts = {
